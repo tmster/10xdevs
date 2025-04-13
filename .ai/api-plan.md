@@ -220,6 +220,40 @@ Authentication is handled by Supabase Auth, with no custom API endpoints require
 
 ### Generations
 
+#### Create Generation
+- Method: POST
+- Path: `/api/generations`
+- Description: Tworzy nowy rekord generacji poprzez przesłanie tekstu (wymagane długości: 1000-10000 znaków) oraz opcji, co inicjuje generowanie fiszek przez AI.
+- Request:
+  ```json
+  {
+    "text": "string",
+    "options": {
+      "max_cards": 10
+    }
+  }
+  ```
+- Response:
+  ```json
+  {
+    "generation_id": "uuid",
+    "flashcards": [
+      {
+        "id": "uuid",
+        "front": "string",
+        "back": "string",
+        "status": "pending",
+        "source": "ai-full"
+      }
+    ]
+  }
+  ```
+- Success: 201 Created
+- Errors:
+  - 400 Bad Request: Niepoprawne dane wejściowe (np. tekst zbyt krótki lub zbyt długi)
+  - 401 Unauthorized: Użytkownik nie jest uwierzytelniony
+  - 500 Internal Server Error: Błąd serwera
+
 #### Get Generation History
 - Method: GET
 - Path: `/api/generations`
