@@ -1,0 +1,73 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { CreateGenerationInput } from "../schemas/generation.schema";
+import type { CreateGenerationResponse, GeneratedFlashcardDTO } from "../../types";
+import { v4 as uuidv4 } from "uuid";
+
+export class GenerationService {
+  constructor(private readonly supabase: SupabaseClient) {}
+
+  async createGeneration(userId: string, input: CreateGenerationInput): Promise<CreateGenerationResponse> {
+    const generationId = uuidv4();
+    const now = new Date().toISOString();
+
+    // Create initial generation record
+    const { error: generationError } = await this.supabase.from("generations").insert({
+      id: generationId,
+      user_id: userId,
+      created_at: now,
+      updated_at: now,
+      log: {
+        text_length: input.text.length,
+        requested_cards: input.options.max_cards,
+        status: "pending",
+      },
+    });
+
+    if (generationError) {
+      console.error("Generation creation error:", generationError);
+      await this.logError(generationId, "DB_INSERT_FAILED", generationError.message);
+      throw new Error(`Failed to create generation record: ${generationError.message}`);
+    }
+
+    // Create initial pending flashcards
+    const flashcards: GeneratedFlashcardDTO[] = Array(input.options.max_cards)
+      .fill(null)
+      .map(() => ({
+        id: uuidv4(),
+        front: "",
+        back: "",
+        status: "pending" as const,
+        source: "ai-full" as const,
+        created_at: now,
+        updated_at: now,
+      }));
+
+    const { error: flashcardsError } = await this.supabase.from("flashcards").insert(
+      flashcards.map((card) => ({
+        ...card,
+        user_id: userId,
+        generation_id: generationId,
+      }))
+    );
+
+    if (flashcardsError) {
+      console.error("Flashcards creation error:", flashcardsError);
+      await this.logError(generationId, "FLASHCARDS_INSERT_FAILED", flashcardsError.message);
+      throw new Error("Failed to create flashcard records");
+    }
+
+    return {
+      generation_id: generationId,
+      flashcards,
+    };
+  }
+
+  private async logError(generationId: string, code: string, message: string) {
+    await this.supabase.from("generation_error_logs").insert({
+      generation_id: generationId,
+      error_code: code,
+      error_message: message,
+      status: "error",
+    });
+  }
+}
