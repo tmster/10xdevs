@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "../../db/supabase.client";
 import type { CreateGenerationInput } from "../schemas/generation.schema";
 import type { CreateGenerationResponse, GeneratedFlashcardDTO } from "../../types";
 import { v4 as uuidv4 } from "uuid";
