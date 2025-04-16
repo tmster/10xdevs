@@ -33,7 +33,7 @@ Authentication is handled by Supabase Auth, with no custom API endpoints require
         "id": "uuid",
         "front": "string",
         "back": "string",
-        "status": "accepted|rejected",
+        "status": "accepted|rejected|pending",
         "source": "ai-full|ai-edited|manual",
         "created_at": "timestamp",
         "updated_at": "timestamp"
@@ -61,7 +61,7 @@ Authentication is handled by Supabase Auth, with no custom API endpoints require
     "id": "uuid",
     "front": "string",
     "back": "string",
-    "status": "accepted|rejected",
+    "status": "accepted|rejected|pending",
     "source": "ai-full|ai-edited|manual",
     "created_at": "timestamp",
     "updated_at": "timestamp"
@@ -111,7 +111,7 @@ Authentication is handled by Supabase Auth, with no custom API endpoints require
   {
     "front": "string",
     "back": "string",
-    "status": "accepted|rejected"
+    "status": "accepted|rejected|pending"
   }
   ```
 - Response:
@@ -120,7 +120,7 @@ Authentication is handled by Supabase Auth, with no custom API endpoints require
     "id": "uuid",
     "front": "string",
     "back": "string",
-    "status": "accepted|rejected",
+    "status": "accepted|rejected|pending",
     "source": "ai-full|ai-edited|manual",
     "created_at": "timestamp",
     "updated_at": "timestamp"
@@ -205,7 +205,7 @@ Authentication is handled by Supabase Auth, with no custom API endpoints require
     "flashcards": [
       {
         "id": "uuid",
-        "status": "accepted|rejected",
+        "status": "accepted|rejected|pending",
         "source": "ai-full|ai-edited"
       }
     ]
@@ -304,7 +304,7 @@ Authentication is handled by Supabase Auth, with no custom API endpoints require
         "id": "uuid",
         "front": "string",
         "back": "string",
-        "status": "accepted|rejected",
+        "status": "accepted|rejected|pending",
         "source": "ai-full|ai-edited"
       }
     ],
