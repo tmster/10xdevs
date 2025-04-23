@@ -153,3 +153,16 @@ export interface StatisticsDTO {
 export interface DeleteUserAccountResponseDTO {
   success: boolean;
 }
+
+/*
+  View Models for UI Components
+*/
+
+// Extended status type for UI state
+export type FlashcardStatus = "pending" | "accepted" | "rejected";
+
+// View model for flashcard UI component
+export type FlashcardViewModel = Omit<GeneratedFlashcardDTO, "status"> & {
+  status: FlashcardStatus;
+  isEditing?: boolean;
+};
