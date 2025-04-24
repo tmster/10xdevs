@@ -1,0 +1,8 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import { FlashcardsIndexView } from "@/components/flashcards/FlashcardsIndexView";
+---
+
+<MainLayout title="Flashcards List">
+  <FlashcardsIndexView client:load />
+</MainLayout>

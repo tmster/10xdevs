@@ -1,0 +1,19 @@
+---
+import Layout from "./Layout.astro";
+
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Layout title={title}>
+  <main class="min-h-screen bg-background">
+    <div class="relative flex min-h-screen flex-col">
+      <div class="flex-1">
+        <slot />
+      </div>
+    </div>
+  </main>
+</Layout>
