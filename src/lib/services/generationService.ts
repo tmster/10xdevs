@@ -1,13 +1,16 @@
 import type { SupabaseClient } from "../../db/supabase.client";
 import type { CreateGenerationInput } from "../schemas/generation.schema";
 import type { CreateGenerationResponse, GeneratedFlashcardDTO } from "../../types";
-import { v4 as uuidv4 } from "uuid";
+import { FlashcardGenerationService } from "./openrouter/flashcard.service";
 
 export class GenerationService {
-  constructor(private readonly supabase: SupabaseClient) {}
+  constructor(
+    private readonly supabase: SupabaseClient,
+    private readonly flashcardGenerator: FlashcardGenerationService
+  ) {}
 
   async createGeneration(userId: string, input: CreateGenerationInput): Promise<CreateGenerationResponse> {
-    const generationId = uuidv4();
+    const generationId = crypto.randomUUID();
     const now = new Date().toISOString();
 
     // Create initial generation record
@@ -29,37 +32,51 @@ export class GenerationService {
       throw new Error(`Failed to create generation record: ${generationError.message}`);
     }
 
-    // Create initial pending flashcards
-    const flashcards: GeneratedFlashcardDTO[] = Array(input.options.max_cards)
-      .fill(null)
-      .map(() => ({
-        id: uuidv4(),
-        front: "",
-        back: "",
-        status: "pending" as const,
-        source: "ai-full" as const,
-        created_at: now,
-        updated_at: now,
-      }));
+    try {
+      // Generate flashcards using AI
+      const flashcards = await this.flashcardGenerator.generateFlashcards(
+        input.text,
+        input.options.max_cards
+      );
 
-    const { error: flashcardsError } = await this.supabase.from("flashcards").insert(
-      flashcards.map((card) => ({
-        ...card,
-        user_id: userId,
+      // Insert generated flashcards
+      const { error: flashcardsError } = await this.supabase.from("flashcards").insert(
+        flashcards.map((card) => ({
+          ...card,
+          user_id: userId,
+          generation_id: generationId,
+        }))
+      );
+
+      if (flashcardsError) {
+        console.error("Flashcards creation error:", flashcardsError);
+        await this.logError(generationId, "FLASHCARDS_INSERT_FAILED", flashcardsError.message);
+        throw new Error("Failed to create flashcard records");
+      }
+
+      // Update generation status to completed
+      await this.supabase
+        .from("generations")
+        .update({
+          updated_at: new Date().toISOString(),
+          log: {
+            text_length: input.text.length,
+            requested_cards: input.options.max_cards,
+            status: "completed",
+          },
+        })
+        .eq("id", generationId);
+
+      return {
         generation_id: generationId,
-      }))
-    );
-
-    if (flashcardsError) {
-      console.error("Flashcards creation error:", flashcardsError);
-      await this.logError(generationId, "FLASHCARDS_INSERT_FAILED", flashcardsError.message);
-      throw new Error("Failed to create flashcard records");
+        flashcards,
+      };
+    } catch (error) {
+      console.error("Flashcard generation error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      await this.logError(generationId, "AI_GENERATION_FAILED", errorMessage);
+      throw error;
     }
-
-    return {
-      generation_id: generationId,
-      flashcards,
-    };
   }
 
   private async logError(generationId: string, code: string, message: string) {

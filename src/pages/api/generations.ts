@@ -1,49 +1,42 @@
 import type { APIRoute } from "astro";
 import { createGenerationSchema } from "../../lib/schemas/generation.schema";
-import { GenerationService } from "../../lib/services/generationService";
+import { ServiceFactory } from "../../lib/services/factory";
 import { DELAULT_USER_ID } from "../../db/supabase.client";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Parse and validate request body
-    const body = await request.json();
-    const result = createGenerationSchema.safeParse(body);
+    // In production, we should require authentication
+    const userId = locals.user?.id || DELAULT_USER_ID;
 
-    if (!result.success) {
+    const body = await request.json();
+    const validationResult = createGenerationSchema.safeParse(body);
+
+    if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: "Invalid input",
-          details: result.error.errors,
+          error: "Validation failed",
+          details: validationResult.error.errors,
         }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 400 }
       );
     }
 
-    // Process generation using default user ID
-    const generationService = new GenerationService(locals.supabase);
-    const response = await generationService.createGeneration(DELAULT_USER_ID, result.data);
+    const generationService = ServiceFactory.getInstance().createGenerationService(locals.supabase);
+    const result = await generationService.createGeneration(userId, validationResult.data);
 
-    return new Response(JSON.stringify(response), {
+    return new Response(JSON.stringify(result), {
       status: 201,
-      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Generation creation failed:", error);
-
     return new Response(
       JSON.stringify({
-        error: "Internal server error",
-        message: "Failed to process generation request",
+        error: "Failed to create generation",
+        details: error instanceof Error ? error.message : "Unknown error",
       }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+      { status: 500 }
     );
   }
 };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { FlashcardViewModel, CreateGenerationResponse } from "@/types";
+import type { FlashcardViewModel, CreateGenerationResponse, UpdateFlashcardCommand, FlashcardStatus } from "@/types";
 import { GenerationForm } from "./GenerationForm";
 import { FlashcardsList } from "./FlashcardsList";
 import { BulkSaveButton } from "./BulkSaveButton";
@@ -12,6 +12,7 @@ import { useApiCall } from "@/hooks/useApiCall";
 export function GenerationView() {
   const [generationId, setGenerationId] = useState<string | null>(null);
   const [flashcards, setFlashcards] = useState<FlashcardViewModel[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const {
     isLoading: isGenerating,
@@ -58,8 +59,39 @@ export function GenerationView() {
     return response;
   };
 
-  const handleFlashcardUpdate = (id: string, updates: Partial<FlashcardViewModel>) => {
-    setFlashcards((cards) => cards.map((card) => (card.id === id ? { ...card, ...updates } : card)));
+  const handleEdit = async (id: string, data: UpdateFlashcardCommand) => {
+    const status = data.status as FlashcardStatus;
+    setFlashcards((cards) =>
+      cards.map((card) => (card.id === id ? { ...card, ...data, status } : card))
+    );
+  };
+
+  const handleDelete = (id: string) => {
+    setFlashcards((cards) => cards.filter((card) => card.id !== id));
+    setSelectedIds((ids) => ids.filter((selectedId) => selectedId !== id));
+  };
+
+  const handleFlashcardSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const isSelected = prev.includes(id);
+      return isSelected
+        ? prev.filter(selectedId => selectedId !== id)
+        : [...prev, id];
+    });
+
+    // Update the flashcard status when selected/deselected
+    setFlashcards(cards =>
+      cards.map(card => {
+        if (card.id === id) {
+          const isSelected = !selectedIds.includes(id);
+          return {
+            ...card,
+            status: isSelected ? "accepted" as const : "pending" as const
+          };
+        }
+        return card;
+      })
+    );
   };
 
   const handleSaveSuccess = () => {
@@ -107,13 +139,17 @@ export function GenerationView() {
           <>
             <FlashcardsList
               flashcards={flashcards}
-              onFlashcardUpdate={handleFlashcardUpdate}
+              pagination={{ page: 1, perPage: 10, total: flashcards.length }}
+              selectedIds={selectedIds}
               isLoading={isGenerating}
-              error={generationError}
+              onPageChange={() => {}} // No pagination needed for generated cards
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onSelect={handleFlashcardSelect}
             />
             <BulkSaveButton
               generationId={generationId!}
-              flashcards={flashcards}
+              flashcards={flashcards.filter(f => selectedIds.includes(f.id))}
               onSuccess={handleSaveSuccess}
               onError={handleSaveError}
             />
