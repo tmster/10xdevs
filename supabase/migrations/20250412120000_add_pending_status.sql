@@ -9,14 +9,20 @@
   Date: 2025-04-12
 */
 
--- temporarily disable the check constraint
+-- temporarily disable the check constraint and foreign key
 alter table public.flashcards
-  drop constraint if exists flashcards_status_check;
+  drop constraint if exists flashcards_status_check,
+  drop constraint if exists flashcards_generation_id_fkey;
 
 -- add new check constraint with pending status
 alter table public.flashcards
   add constraint flashcards_status_check
   check (status in ('accepted', 'rejected', 'pending'));
+
+-- recreate the foreign key constraint
+alter table public.flashcards
+  add constraint flashcards_generation_id_fkey
+  foreign key (generation_id) references public.generations(id) on delete set null;
 
 -- add comment explaining the status values
 comment on column public.flashcards.status is 'Status of the flashcard: pending (awaiting review), accepted, or rejected by the user';

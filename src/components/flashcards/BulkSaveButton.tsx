@@ -31,7 +31,7 @@ export function BulkSaveButton({ generationId, flashcards, onSuccess, onError }:
             generation_id: generationId,
             flashcards: acceptedFlashcards.map((f) => ({
               id: f.id,
-              action: "accept",
+              action: "accept"
             })),
           }),
         });
