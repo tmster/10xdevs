@@ -64,6 +64,10 @@ Kryteria akceptacji:
 - Po podaniu prawidłowych danych logowania użytkownik zostaje przekierowany do widoku generowania fiszek.
 - Błędne dane logowania wyświetlają komunikat o nieprawidłowych danych.
 - Dane dotyczące logowania przechowywane są w bezpieczny sposób.
+- Użytkownik może logować się do systemu poprzez przycisk w prawym górnym rogu.
+- Użytkownik może się wylogować z systemu poprzez przycisk w prawym górnym rogu w głównym @Layout.astro.
+- Nie korzystamy z zewnętrznych serwisów logowania (np. Google, GitHub).
+- Odzyskiwanie hasła powinno być możliwe.
 
 ID: US-003
 Tytuł: Generowanie fiszek przy użyciu AI
@@ -121,6 +125,13 @@ Opis: Jako zalogowany użytkownik chcę mieć pewność, że moje fiszki nie są
 Kryteria akceptacji:
 - Tylko zalogowany użytkownik może wyświetlać, edytować i usuwać swoje fiszki.
 - Nie ma dostępu do fiszek innych użytkowników ani możliwości współdzielenia.
+- Użytkownik NIE MOŻE Generowanie fiszek przy użyciu AI bez logowania się do systemu (US-003).
+- Użytkownik NIE MOŻE Przeglać i zatwierdzać propozycji fiszek bez logowania się do systemu (US-004).
+- Użytkownik NIE MOŻE Edytować fiszek utworzonych ręcznie i generowanych przez AI (US-005)
+- Użytkownik NIE MOŻE Usuwać fiszek (US-006)
+- Użytkownik NIE MOŻE Ręczne tworzyć fiszek (US-007)
+- Użytkownik NIE MOŻE Sesja nauki z algorytmem powtórek (US-008)
+
 
 ## 6. Metryki sukcesu
 1. Efektywność generowania fiszek:
