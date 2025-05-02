@@ -1,0 +1,13 @@
+---
+import AuthLayout from "../layouts/AuthLayout.astro";
+import { LoginForm } from "../components/auth/LoginForm";
+---
+
+<AuthLayout title="Sign in to your account">
+  <Fragment slot="heading">Sign in to your account</Fragment>
+  <Fragment slot="subheading">
+    Welcome back! Please enter your details below.
+  </Fragment>
+
+  <LoginForm client:load />
+</AuthLayout>

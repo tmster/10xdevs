@@ -1,0 +1,27 @@
+---
+import Layout from "./Layout.astro";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Authentication" } = Astro.props;
+---
+
+<Layout title={title}>
+  <div class="flex min-h-screen items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8">
+      <div class="text-center">
+        <h2 class="mt-6 text-3xl font-bold tracking-tight text-foreground">
+          <slot name="heading" />
+        </h2>
+        <p class="mt-2 text-sm text-muted-foreground">
+          <slot name="subheading" />
+        </p>
+      </div>
+      <div class="mt-8 bg-card py-8 px-4 shadow sm:rounded-lg sm:px-10 border">
+        <slot />
+      </div>
+    </div>
+  </div>
+</Layout>
