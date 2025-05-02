@@ -1,8 +1,7 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+// Root page - middleware will handle redirects based on authentication
 ---
 
-<Layout>
-  <Welcome />
-</Layout>
+<!-- Empty page content because middleware will handle redirection -->
+
+export const prerender = false;

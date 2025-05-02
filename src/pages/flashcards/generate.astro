@@ -1,11 +1,11 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 import { GenerationView } from "@/components/flashcards/GenerationView";
 ---
 
-<Layout title="Generate Flashcards">
-  <main class="container mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-6">Generate Flashcards</h1>
-    <GenerationView client:load />
-  </main>
-</Layout>
+<AppLayout title="Generate Flashcards">
+  <h1 class="text-3xl font-bold mb-6">Generate Flashcards</h1>
+  <GenerationView client:load />
+</AppLayout>
+
+export const prerender = false;

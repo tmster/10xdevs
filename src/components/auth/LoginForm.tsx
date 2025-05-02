@@ -13,8 +13,40 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Form submission will be implemented later
-    // This is just UI implementation
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+        redirect: "follow",
+      });
+
+      // If the response is a redirect (status 3xx), follow it
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
+
+      // Handle error responses
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || "Failed to sign in. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // If not redirected but successful, go to flashcards list
+      window.location.href = "/flashcards/list";
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error("Login error:", err);
+      setIsLoading(false);
+    }
   };
 
   return (

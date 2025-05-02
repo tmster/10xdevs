@@ -1,8 +1,10 @@
 ---
-import MainLayout from "@/layouts/MainLayout.astro";
+import AppLayout from "@/layouts/AppLayout.astro";
 import { FlashcardsIndexView } from "@/components/flashcards/FlashcardsIndexView";
 ---
 
-<MainLayout title="Flashcards List">
+<AppLayout title="My Flashcards">
   <FlashcardsIndexView client:load />
-</MainLayout>
+</AppLayout>
+
+export const prerender = false;
