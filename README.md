@@ -10,6 +10,8 @@ A modern web application built with Astro and React, designed to help developers
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Available Scripts](#available-scripts)
+- [Project Structure](#project-structure)
+- [Testing](#testing)
 - [Project Scope](#project-scope)
 - [Project Status](#project-status)
 - [License](#license)
@@ -21,6 +23,12 @@ A modern web application built with Astro and React, designed to help developers
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) v4.0.17
 - **Components**: [Shadcn/ui](https://ui.shadcn.com/)
 - **Language**: [TypeScript](https://www.typescriptlang.org/) v5
+- **Backend**: [Supabase](https://supabase.io/) for authentication and database
+- **Testing**:
+  - [Vitest](https://vitest.dev/) for unit and integration tests
+  - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for component testing
+  - [Playwright](https://playwright.dev/) for end-to-end tests
+  - [MSW](https://mswjs.io/) for API mocking
 - **Development Tools**:
   - ESLint for code linting
   - Prettier for code formatting
@@ -68,6 +76,14 @@ A modern web application built with Astro and React, designed to help developers
 - `npm run dev` - Start development server
 - `npm run build` - Build the production application
 - `npm run preview` - Preview the production build locally
+- `npm run test` - Run unit and integration tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage reporting
+- `npm run test:ui` - Run tests with the UI interface
+- `npm run e2e` - Run Playwright end-to-end tests
+- `npm run e2e:ui` - Run Playwright tests with UI mode
+- `npm run e2e:codegen` - Generate Playwright tests from browser interactions
+- `npm run e2e:report` - Display the Playwright HTML test report
 - `npm run lint` - Run ESLint to check code
 - `npm run lint:fix` - Fix linting issues automatically
 - `npm run format` - Format code using Prettier
@@ -75,16 +91,70 @@ A modern web application built with Astro and React, designed to help developers
 ## Project Structure
 
 ```
-./src/
-├── layouts/     # Astro layouts
-├── pages/       # Astro pages and API endpoints
-├── middleware/  # Astro middleware
-├── db/         # Database clients and types
-├── components/ # UI components (Astro and React)
-├── lib/        # Services and helpers
-├── assets/     # Internal assets
-└── types.ts    # Shared types
+./
+├── src/
+│   ├── layouts/      # Astro layouts
+│   ├── pages/        # Astro pages and API endpoints
+│   ├── middleware/   # Astro middleware
+│   ├── db/           # Database clients and types
+│   ├── components/   # UI components (Astro and React)
+│   │   └── ui/       # Shadcn/ui components
+│   ├── lib/          # Services and helpers
+│   ├── assets/       # Internal assets
+│   └── types.ts      # Shared types
+├── public/           # Static assets
+├── tests/            # Unit and integration tests
+│   └── setup.ts      # Test setup for Vitest
+└── e2e/              # End-to-end tests with Playwright
+    ├── pages/        # Page object models
+    └── *.spec.ts     # Test specifications
 ```
+
+## Testing
+
+The project uses a comprehensive testing approach:
+
+### Unit and Integration Testing
+
+Unit and integration tests are written using Vitest and React Testing Library. They focus on testing individual components, utilities, and services.
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate test coverage report
+npm run test:coverage
+```
+
+### End-to-End Testing
+
+End-to-end tests use Playwright and follow the Page Object Model pattern for better maintainability:
+
+```bash
+# Run all e2e tests
+npm run e2e
+
+# Run e2e tests with UI mode (for debugging)
+npm run e2e:ui
+
+# Generate tests from browser interactions
+npm run e2e:codegen
+
+# View test reports
+npm run e2e:report
+```
+
+#### Page Object Model
+
+The e2e tests are organized using the Page Object pattern:
+
+- `e2e/pages/` - Contains page objects that encapsulate page structure and actions
+- `e2e/*.spec.ts` - Test specifications that use the page objects
+
+This separation makes tests more maintainable and easier to update when the UI changes.
 
 ## Project Scope
 
@@ -94,6 +164,7 @@ The project aims to provide a modern, type-safe web application with:
 - Interactive UI components built with React
 - Consistent styling with Tailwind CSS
 - Robust type safety with TypeScript
+- Comprehensive testing at all levels (unit, integration, e2e)
 - Clean and maintainable code structure
 - Modern development tooling and best practices
 
