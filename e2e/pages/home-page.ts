@@ -52,11 +52,4 @@ export class HomePage {
 
     await link.click();
   }
-
-  /**
-   * Take a screenshot for visual comparison
-   */
-  async takeScreenshot(name: string) {
-    await this.page.screenshot({ path: `./screenshots/home-${name}.png` });
-  }
 }

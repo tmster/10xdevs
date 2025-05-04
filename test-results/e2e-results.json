@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 4
+      "actualWorkers": 5
     },
     "preserveOutput": "always",
     "reporter": [
@@ -37,7 +37,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 5
         },
         "id": "chromium",
         "name": "chromium",
@@ -93,16 +93,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 23,
+                      "duration": 4,
                       "errors": [],
-                      "stdout": [
-                        {
-                          "text": "Environment variable TEST_VARIABLE: working\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T12:27:18.015Z",
+                      "startTime": "2025-05-04T19:05:52.730Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -113,6 +109,129 @@
               "id": "ffab4e439d13b4462634-f579b6a3e36c6c5cc412",
               "file": "env-test.spec.ts",
               "line": 4,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "flashcard-generation.spec.ts",
+      "file": "flashcard-generation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Flashcard Generation",
+          "file": "flashcard-generation.spec.ts",
+          "line": 14,
+          "column": 6,
+          "specs": [
+            {
+              "title": "should show the flashcard generation form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5925,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-05-04T19:05:52.737Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e46567f9d80df092973b-e18e5209f8d26093c744",
+              "file": "flashcard-generation.spec.ts",
+              "line": 38,
+              "column": 3
+            },
+            {
+              "title": "should show validation error with insufficient text",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 7454,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-05-04T19:05:52.731Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e46567f9d80df092973b-658795bb5f9abc6ec268",
+              "file": "flashcard-generation.spec.ts",
+              "line": 46,
+              "column": 3
+            },
+            {
+              "title": "should generate flashcards from valid text",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 13354,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Browser console error: Received NaN for the `%s` attribute. If this is expected, cast the value to a string. value\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-05-04T19:05:52.741Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e46567f9d80df092973b-1662b747730c613bdf48",
+              "file": "flashcard-generation.spec.ts",
+              "line": 64,
               "column": 3
             }
           ]
@@ -145,15 +264,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 777,
+                      "duration": 530,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T12:27:18.013Z",
+                      "startTime": "2025-05-04T19:05:52.730Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -196,15 +315,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 776,
+                      "duration": 1409,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T12:27:18.015Z",
+                      "startTime": "2025-05-04T19:05:52.746Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -230,15 +349,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 1374,
+                      "duration": 4425,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T12:27:18.015Z",
+                      "startTime": "2025-05-04T19:05:53.726Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -248,7 +367,7 @@
               ],
               "id": "41d3fd2474a19feb00a1-2c06b5e64f32e53b5b78",
               "file": "login.spec.ts",
-              "line": 15,
+              "line": 12,
               "column": 3
             }
           ]
@@ -258,9 +377,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-04T12:27:12.176Z",
-    "duration": 8928.686000000002,
-    "expected": 4,
+    "startTime": "2025-05-04T19:05:49.549Z",
+    "duration": 17894.58,
+    "expected": 7,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

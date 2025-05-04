@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_PUBLIC_KEY!;
+const supabaseKey = process.env.SUPABASE_KEY!;
 
 // Class to manage test data lifecycle
 export class TestDataManager {

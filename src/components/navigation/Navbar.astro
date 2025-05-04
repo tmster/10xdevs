@@ -5,33 +5,34 @@ import { LogoutButton } from "../auth/LogoutButton";
 const { user } = Astro.locals;
 ---
 
-<div class="w-full bg-slate-800 text-white shadow-md">
+<div class="w-full bg-slate-800 text-white shadow-md" data-testid="navbar">
   <div class="container mx-auto px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-4">
-        <a href="/" class="text-lg font-bold">10x Flashcards</a>
+        <a href="/" class="text-lg font-bold" data-testid="navbar-logo">10x Flashcards</a>
 
         {/* Show navigation links only for logged in users */}
         {user && (
-          <nav class="hidden md:flex space-x-4">
-            <a href="/flashcards/list" class="hover:text-gray-300">My Flashcards</a>
-            <a href="/flashcards/generate" class="hover:text-gray-300">Generate Flashcards</a>
+          <nav class="hidden md:flex space-x-4" data-testid="nav-links">
+            <a href="/flashcards/list" class="hover:text-gray-300" data-testid="flashcards-list-link">My Flashcards</a>
+            <a href="/flashcards/generate" class="hover:text-gray-300" data-testid="generate-flashcards-link">Generate Flashcards</a>
           </nav>
         )}
       </div>
 
       {/* User section - different for logged in and non-logged in users */}
       {user ? (
-        <div class="flex items-center space-x-4">
-          <span class="text-sm text-gray-300">{user.email}</span>
+        <div class="flex items-center space-x-4" data-testid="user-info">
+          <span class="text-sm text-gray-300" data-testid="user-email">{user.email}</span>
           <LogoutButton client:load />
         </div>
       ) : (
-        <div class="flex items-center space-x-4">
-          <a href="/login" class="text-sm font-medium hover:text-gray-300">Login</a>
+        <div class="flex items-center space-x-4" data-testid="auth-buttons">
+          <a href="/login" class="text-sm font-medium hover:text-gray-300" data-testid="login-link">Login</a>
           <a
             href="/register"
             class="text-sm bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md"
+            data-testid="register-link"
           >
             Register
           </a>

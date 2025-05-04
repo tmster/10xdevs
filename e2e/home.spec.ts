@@ -8,8 +8,5 @@ test.describe('Login Page', () => {
 
     // Verify we're on the login page
     await expect(page).toHaveURL(/.*\/login/);
-
-    // Take screenshot for visual comparison
-    await page.screenshot({ path: './screenshots/login-page.png' });
   });
 });

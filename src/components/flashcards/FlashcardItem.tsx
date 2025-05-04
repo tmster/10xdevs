@@ -85,10 +85,10 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
 
   if (isEditing) {
     return (
-      <Card>
+      <Card data-testid={`flashcard-item-${flashcard.id}`}>
         <CardContent className="pt-6 space-y-4">
           {actionError && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" data-testid="flashcard-error">
               <AlertDescription>{actionError.message}</AlertDescription>
             </Alert>
           )}
@@ -102,6 +102,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
               onChange={(e) => setFront(e.target.value)}
               placeholder="Front side"
               aria-label="Front side of the flashcard"
+              data-testid="flashcard-front-input"
             />
           </div>
           <div className="space-y-2">
@@ -114,6 +115,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
               onChange={(e) => setBack(e.target.value)}
               placeholder="Back side"
               aria-label="Back side of the flashcard"
+              data-testid="flashcard-back-input"
             />
           </div>
         </CardContent>
@@ -122,6 +124,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
             onClick={handleSave}
             aria-label="Save changes"
             className="bg-green-600 hover:bg-green-700"
+            data-testid="flashcard-save-button"
           >
             Save
           </Button>
@@ -129,6 +132,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
             onClick={handleCancel}
             variant="outline"
             aria-label="Cancel editing"
+            data-testid="flashcard-cancel-button"
           >
             Cancel
           </Button>
@@ -142,20 +146,21 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
       role="article"
       aria-label="Flashcard"
       className={`relative ${flashcard.status === 'rejected' ? 'opacity-50' : ''}`}
+      data-testid={`flashcard-item-${flashcard.id}`}
     >
       <CardContent className="p-4 space-y-4">
         {actionError && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" data-testid="flashcard-error">
             <AlertDescription>{actionError.message}</AlertDescription>
           </Alert>
         )}
         <div>
           <h3 className="text-sm font-medium text-gray-500">Front</h3>
-          <p className="mt-1">{flashcard.front}</p>
+          <p className="mt-1" data-testid="flashcard-front-content">{flashcard.front}</p>
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-500">Back</h3>
-          <p className="mt-1">{flashcard.back}</p>
+          <p className="mt-1" data-testid="flashcard-back-content">{flashcard.back}</p>
         </div>
       </CardContent>
 
@@ -166,6 +171,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
               onClick={handleSave}
               aria-label="Save changes"
               className="bg-green-600 hover:bg-green-700"
+              data-testid="flashcard-save-button"
             >
               Save
             </Button>
@@ -173,6 +179,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
               onClick={handleCancel}
               variant="outline"
               aria-label="Cancel editing"
+              data-testid="flashcard-cancel-button"
             >
               Cancel
             </Button>
@@ -184,6 +191,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
               disabled={flashcard.status === 'rejected'}
               aria-label="Accept flashcard"
               className="bg-green-600 hover:bg-green-700"
+              data-testid="flashcard-accept-button"
             >
               <CheckIcon className="h-4 w-4" />
               <span className="sr-only">Accept</span>
@@ -193,6 +201,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
               variant="outline"
               disabled={flashcard.status === 'rejected'}
               aria-label="Edit flashcard"
+              data-testid="flashcard-edit-button"
             >
               <PencilIcon className="h-4 w-4" />
               <span className="sr-only">Edit</span>
@@ -203,6 +212,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
               disabled={flashcard.status === 'rejected'}
               aria-label="Reject flashcard"
               className="text-red-600 hover:text-red-700"
+              data-testid="flashcard-reject-button"
             >
               <XIcon className="h-4 w-4" />
               <span className="sr-only">Reject</span>

@@ -165,6 +165,7 @@ export function FlashcardsList({
             onKeyDown={(e) => handleKeyDown(e, flashcard)}
             role="article"
             aria-label={`Flashcard ${index + 1} of ${flashcards.length}`}
+            data-testid={`flashcard-item-${flashcard.id}`}
           >
             <CardContent className="p-4">
               <div className="flex items-start gap-4">

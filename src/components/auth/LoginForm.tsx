@@ -50,9 +50,9 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" data-testid="login-form">
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" data-testid="login-error">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -66,6 +66,7 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          data-testid="email-input"
         />
       </div>
 
@@ -75,6 +76,7 @@ export function LoginForm() {
           <a
             href="/forgot-password"
             className="text-sm font-medium text-primary hover:text-primary/90"
+            data-testid="forgot-password-link"
           >
             Forgot password?
           </a>
@@ -85,6 +87,7 @@ export function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          data-testid="password-input"
         />
       </div>
 
@@ -92,6 +95,7 @@ export function LoginForm() {
         type="submit"
         className="w-full"
         disabled={isLoading}
+        data-testid="login-submit"
       >
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>
@@ -101,6 +105,7 @@ export function LoginForm() {
         <a
           href="/register"
           className="font-medium text-primary hover:text-primary/90"
+          data-testid="register-link"
         >
           Sign up
         </a>

@@ -56,7 +56,7 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" aria-label="Generate flashcards form">
+    <form onSubmit={handleSubmit} className="space-y-6" aria-label="Generate flashcards form" data-testid="generation-form">
       <div className="space-y-2">
         <Label htmlFor="text" className="text-base">
           Text for Flashcard Generation
@@ -73,6 +73,7 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
           disabled={isLoading}
           aria-invalid={validationError ? "true" : "false"}
           aria-describedby={validationError ? "text-error" : "text-hint"}
+          data-testid="generation-text-input"
         />
         <Progress
           value={progress}
@@ -81,9 +82,10 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={progress}
+          data-testid="text-progress"
         />
         {validationError ? (
-          <Alert variant="destructive" id="text-error" role="alert">
+          <Alert variant="destructive" id="text-error" role="alert" data-testid="text-validation-error">
             <AlertDescription>{validationError}</AlertDescription>
           </Alert>
         ) : (
@@ -107,6 +109,7 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
           disabled={isLoading}
           className="w-32"
           aria-describedby="maxCards-hint"
+          data-testid="max-cards-input"
         />
         <p id="maxCards-hint" className="text-sm text-gray-500">
           Choose between 1 and 10 flashcards to generate.
@@ -118,6 +121,7 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
         disabled={!isValidLength || isLoading}
         aria-busy={isLoading}
         className="w-full sm:w-auto"
+        data-testid="generate-button"
       >
         {isLoading ? (
           <>

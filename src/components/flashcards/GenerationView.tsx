@@ -106,23 +106,23 @@ export function GenerationView() {
 
   return (
     <ErrorBoundary>
-      <div className="space-y-8">
+      <div className="space-y-8" data-testid="generation-view">
         <GenerationForm onSubmit={handleGeneration} isLoading={isGenerating} />
 
         {generationError && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" data-testid="generation-error">
             <AlertDescription>{generationError.message}</AlertDescription>
           </Alert>
         )}
 
         {saveError && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" data-testid="save-error">
             <AlertDescription>{saveError.message}</AlertDescription>
           </Alert>
         )}
 
         {isGenerating && (
-          <div className="space-y-4">
+          <div className="space-y-4" data-testid="loading-skeleton">
             <Skeleton className="h-8 w-48" />
             <div className="grid gap-4 md:grid-cols-2">
               {[...Array(3)].map((_, i) => (
@@ -136,7 +136,7 @@ export function GenerationView() {
         )}
 
         {!isGenerating && flashcards.length > 0 && (
-          <>
+          <div data-testid="generated-flashcards">
             <FlashcardsList
               flashcards={flashcards}
               pagination={{ page: 1, perPage: 10, total: flashcards.length }}
@@ -153,7 +153,7 @@ export function GenerationView() {
               onSuccess={handleSaveSuccess}
               onError={handleSaveError}
             />
-          </>
+          </div>
         )}
       </div>
     </ErrorBoundary>

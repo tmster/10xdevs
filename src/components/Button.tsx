@@ -6,6 +6,7 @@ type ButtonProps = {
   disabled?: boolean;
   variant?: 'primary' | 'secondary' | 'danger';
   className?: string;
+  testId?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -14,6 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   variant = 'primary',
   className = '',
+  testId,
 }) => {
   const variantClasses = {
     primary: 'bg-blue-600 hover:bg-blue-700 text-white',
@@ -30,6 +32,7 @@ const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       type="button"
+      data-testid={testId}
     >
       {label}
     </button>

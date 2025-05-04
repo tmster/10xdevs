@@ -8,11 +8,9 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_PUBLIC_KEY!;
+const supabaseKey = process.env.SUPABASE_KEY!;
 
 async function globalTeardown(config: FullConfig) {
-  console.log('Starting global teardown...');
-
   // Create the Supabase client for test cleanup
   const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -23,7 +21,6 @@ async function globalTeardown(config: FullConfig) {
   });
 
   if (signInError) {
-    console.error('Error signing in for test cleanup:', signInError);
     throw signInError;
   }
 
@@ -48,19 +45,11 @@ async function globalTeardown(config: FullConfig) {
         .delete()
         .in('generation_id', generationIds);
 
-      if (errorLogsDeleteError) {
-        console.error('Error deleting test generation error logs:', errorLogsDeleteError);
-      }
-
       // 2. Delete flashcards associated with these generations
       const { error: flashcardsDeleteError } = await supabase
         .from('flashcards')
         .delete()
         .in('generation_id', generationIds);
-
-      if (flashcardsDeleteError) {
-        console.error('Error deleting test flashcards by generation:', flashcardsDeleteError);
-      }
     }
 
     // 3. Delete any remaining flashcards created by the test user
@@ -69,27 +58,16 @@ async function globalTeardown(config: FullConfig) {
       .delete()
       .eq('user_id', testUserId);
 
-    if (remainingFlashcardsError) {
-      console.error('Error deleting remaining test flashcards:', remainingFlashcardsError);
-    }
-
     // 4. Delete all generations created by the test user
     const { error: generationsDeleteError } = await supabase
       .from('generations')
       .delete()
       .eq('user_id', testUserId);
 
-    if (generationsDeleteError) {
-      console.error('Error deleting test generations:', generationsDeleteError);
-    }
-
     // Note: We don't delete from the users table since it's managed by Supabase Auth
-
   } catch (error) {
-    console.error('Error during test data cleanup:', error);
+    // Errors during teardown should not break the test run
   }
-
-  console.log('Global teardown completed');
 }
 
 export default globalTeardown;
