@@ -72,9 +72,17 @@ comment on column public.generation_error_logs.error_code is 'Error code for pro
 comment on column public.generation_error_logs.error_message is 'Detailed error message for debugging';
 
 -- set up foreign key from flashcards to generations
-alter table public.flashcards
-add constraint flashcards_generation_id_fkey
-foreign key (generation_id) references public.generations(id) on delete set null;
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.constraint_column_usage
+    where constraint_name = 'flashcards_generation_id_fkey'
+  ) then
+    alter table public.flashcards
+    add constraint flashcards_generation_id_fkey
+    foreign key (generation_id) references public.generations(id) on delete set null;
+  end if;
+end $$;
 
 -- create indexes for improved query performance
 create index if not exists flashcards_user_id_idx on public.flashcards(user_id);
@@ -94,17 +102,26 @@ end;
 $$ language plpgsql;
 
 -- create triggers for automatically updating updated_at column
-create trigger update_flashcards_updated_at
-before update on public.flashcards
-for each row execute function public.update_updated_at_column();
+do $$
+begin
+  if not exists (select 1 from pg_trigger where tgname = 'update_flashcards_updated_at') then
+    create trigger update_flashcards_updated_at
+    before update on public.flashcards
+    for each row execute function public.update_updated_at_column();
+  end if;
 
-create trigger update_generations_updated_at
-before update on public.generations
-for each row execute function public.update_updated_at_column();
+  if not exists (select 1 from pg_trigger where tgname = 'update_generations_updated_at') then
+    create trigger update_generations_updated_at
+    before update on public.generations
+    for each row execute function public.update_updated_at_column();
+  end if;
 
-create trigger update_generation_error_logs_updated_at
-before update on public.generation_error_logs
-for each row execute function public.update_updated_at_column();
+  if not exists (select 1 from pg_trigger where tgname = 'update_generation_error_logs_updated_at') then
+    create trigger update_generation_error_logs_updated_at
+    before update on public.generation_error_logs
+    for each row execute function public.update_updated_at_column();
+  end if;
+end $$;
 
 -- enable row level security (rls) on all tables
 alter table public.flashcards enable row level security;
@@ -112,137 +129,182 @@ alter table public.generations enable row level security;
 alter table public.generation_error_logs enable row level security;
 
 -- flashcards rls policies
--- policy for authenticated users to select only their own flashcards
-create policy "Users can view their own flashcards"
-on public.flashcards for select
-to authenticated
-using (auth.uid() = user_id);
+do $$
+begin
+  -- policy for authenticated users to select only their own flashcards
+  if not exists (select 1 from pg_policies where policyname = 'Users can view their own flashcards' and tablename = 'flashcards') then
+    create policy "Users can view their own flashcards"
+    on public.flashcards for select
+    to authenticated
+    using (auth.uid() = user_id);
+  end if;
 
--- policy for authenticated users to insert only their own flashcards
-create policy "Users can insert their own flashcards"
-on public.flashcards for insert
-to authenticated
-with check (auth.uid() = user_id);
+  -- policy for authenticated users to insert only their own flashcards
+  if not exists (select 1 from pg_policies where policyname = 'Users can insert their own flashcards' and tablename = 'flashcards') then
+    create policy "Users can insert their own flashcards"
+    on public.flashcards for insert
+    to authenticated
+    with check (auth.uid() = user_id);
+  end if;
 
--- policy for authenticated users to update only their own flashcards
-create policy "Users can update their own flashcards"
-on public.flashcards for update
-to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+  -- policy for authenticated users to update only their own flashcards
+  if not exists (select 1 from pg_policies where policyname = 'Users can update their own flashcards' and tablename = 'flashcards') then
+    create policy "Users can update their own flashcards"
+    on public.flashcards for update
+    to authenticated
+    using (auth.uid() = user_id)
+    with check (auth.uid() = user_id);
+  end if;
 
--- policy for authenticated users to delete only their own flashcards
-create policy "Users can delete their own flashcards"
-on public.flashcards for delete
-to authenticated
-using (auth.uid() = user_id);
+  -- policy for authenticated users to delete only their own flashcards
+  if not exists (select 1 from pg_policies where policyname = 'Users can delete their own flashcards' and tablename = 'flashcards') then
+    create policy "Users can delete their own flashcards"
+    on public.flashcards for delete
+    to authenticated
+    using (auth.uid() = user_id);
+  end if;
 
--- anonymous users cannot access flashcards
-create policy "Anonymous users cannot view flashcards"
-on public.flashcards for select
-to anon
-using (false);
+  -- anonymous users cannot access flashcards
+  if not exists (select 1 from pg_policies where policyname = 'Anonymous users cannot view flashcards' and tablename = 'flashcards') then
+    create policy "Anonymous users cannot view flashcards"
+    on public.flashcards for select
+    to anon
+    using (false);
+  end if;
 
-create policy "Anonymous users cannot insert flashcards"
-on public.flashcards for insert
-to anon
-with check (false);
+  if not exists (select 1 from pg_policies where policyname = 'Anonymous users cannot insert flashcards' and tablename = 'flashcards') then
+    create policy "Anonymous users cannot insert flashcards"
+    on public.flashcards for insert
+    to anon
+    with check (false);
+  end if;
+end $$;
 
 -- generations rls policies
--- policy for authenticated users to select only their own generations
-create policy "Users can view their own generations"
-on public.generations for select
-to authenticated
-using (auth.uid() = user_id);
+do $$
+begin
+  -- policy for authenticated users to select only their own generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can view their own generations' and tablename = 'generations') then
+    create policy "Users can view their own generations"
+    on public.generations for select
+    to authenticated
+    using (auth.uid() = user_id);
+  end if;
 
--- policy for authenticated users to insert only their own generations
-create policy "Users can insert their own generations"
-on public.generations for insert
-to authenticated
-with check (auth.uid() = user_id);
+  -- policy for authenticated users to insert only their own generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can insert their own generations' and tablename = 'generations') then
+    create policy "Users can insert their own generations"
+    on public.generations for insert
+    to authenticated
+    with check (auth.uid() = user_id);
+  end if;
 
--- policy for authenticated users to update only their own generations
-create policy "Users can update their own generations"
-on public.generations for update
-to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+  -- policy for authenticated users to update only their own generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can update their own generations' and tablename = 'generations') then
+    create policy "Users can update their own generations"
+    on public.generations for update
+    to authenticated
+    using (auth.uid() = user_id)
+    with check (auth.uid() = user_id);
+  end if;
 
--- policy for authenticated users to delete only their own generations
-create policy "Users can delete their own generations"
-on public.generations for delete
-to authenticated
-using (auth.uid() = user_id);
+  -- policy for authenticated users to delete only their own generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can delete their own generations' and tablename = 'generations') then
+    create policy "Users can delete their own generations"
+    on public.generations for delete
+    to authenticated
+    using (auth.uid() = user_id);
+  end if;
 
--- anonymous users cannot access generations
-create policy "Anonymous users cannot view generations"
-on public.generations for select
-to anon
-using (false);
+  -- anonymous users cannot access generations
+  if not exists (select 1 from pg_policies where policyname = 'Anonymous users cannot view generations' and tablename = 'generations') then
+    create policy "Anonymous users cannot view generations"
+    on public.generations for select
+    to anon
+    using (false);
+  end if;
 
-create policy "Anonymous users cannot insert generations"
-on public.generations for insert
-to anon
-with check (false);
+  if not exists (select 1 from pg_policies where policyname = 'Anonymous users cannot insert generations' and tablename = 'generations') then
+    create policy "Anonymous users cannot insert generations"
+    on public.generations for insert
+    to anon
+    with check (false);
+  end if;
+end $$;
 
 -- generation_error_logs rls policies
--- policy for authenticated users to select only error logs related to their generations
-create policy "Users can view error logs for their own generations"
-on public.generation_error_logs for select
-to authenticated
-using (
-  exists (
-    select 1 from public.generations g
-    where g.id = generation_id and g.user_id = auth.uid()
-  )
-);
+do $$
+begin
+  -- policy for authenticated users to select only error logs related to their generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can view error logs for their own generations' and tablename = 'generation_error_logs') then
+    create policy "Users can view error logs for their own generations"
+    on public.generation_error_logs for select
+    to authenticated
+    using (
+      exists (
+        select 1 from public.generations g
+        where g.id = generation_id and g.user_id = auth.uid()
+      )
+    );
+  end if;
 
--- policy for authenticated users to insert error logs only for their generations
-create policy "Users can insert error logs for their own generations"
-on public.generation_error_logs for insert
-to authenticated
-with check (
-  exists (
-    select 1 from public.generations g
-    where g.id = generation_id and g.user_id = auth.uid()
-  )
-);
+  -- policy for authenticated users to insert error logs only for their generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can insert error logs for their own generations' and tablename = 'generation_error_logs') then
+    create policy "Users can insert error logs for their own generations"
+    on public.generation_error_logs for insert
+    to authenticated
+    with check (
+      exists (
+        select 1 from public.generations g
+        where g.id = generation_id and g.user_id = auth.uid()
+      )
+    );
+  end if;
 
--- policy for authenticated users to update error logs only for their generations
-create policy "Users can update error logs for their own generations"
-on public.generation_error_logs for update
-to authenticated
-using (
-  exists (
-    select 1 from public.generations g
-    where g.id = generation_id and g.user_id = auth.uid()
-  )
-)
-with check (
-  exists (
-    select 1 from public.generations g
-    where g.id = generation_id and g.user_id = auth.uid()
-  )
-);
+  -- policy for authenticated users to update error logs only for their generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can update error logs for their own generations' and tablename = 'generation_error_logs') then
+    create policy "Users can update error logs for their own generations"
+    on public.generation_error_logs for update
+    to authenticated
+    using (
+      exists (
+        select 1 from public.generations g
+        where g.id = generation_id and g.user_id = auth.uid()
+      )
+    )
+    with check (
+      exists (
+        select 1 from public.generations g
+        where g.id = generation_id and g.user_id = auth.uid()
+      )
+    );
+  end if;
 
--- policy for authenticated users to delete error logs only for their generations
-create policy "Users can delete error logs for their own generations"
-on public.generation_error_logs for delete
-to authenticated
-using (
-  exists (
-    select 1 from public.generations g
-    where g.id = generation_id and g.user_id = auth.uid()
-  )
-);
+  -- policy for authenticated users to delete error logs only for their generations
+  if not exists (select 1 from pg_policies where policyname = 'Users can delete error logs for their own generations' and tablename = 'generation_error_logs') then
+    create policy "Users can delete error logs for their own generations"
+    on public.generation_error_logs for delete
+    to authenticated
+    using (
+      exists (
+        select 1 from public.generations g
+        where g.id = generation_id and g.user_id = auth.uid()
+      )
+    );
+  end if;
 
--- anonymous users cannot access generation error logs
-create policy "Anonymous users cannot view generation error logs"
-on public.generation_error_logs for select
-to anon
-using (false);
+  -- anonymous users cannot access generation error logs
+  if not exists (select 1 from pg_policies where policyname = 'Anonymous users cannot view generation error logs' and tablename = 'generation_error_logs') then
+    create policy "Anonymous users cannot view generation error logs"
+    on public.generation_error_logs for select
+    to anon
+    using (false);
+  end if;
 
-create policy "Anonymous users cannot insert generation error logs"
-on public.generation_error_logs for insert
-to anon
-with check (false);
+  if not exists (select 1 from pg_policies where policyname = 'Anonymous users cannot insert generation error logs' and tablename = 'generation_error_logs') then
+    create policy "Anonymous users cannot insert generation error logs"
+    on public.generation_error_logs for insert
+    to anon
+    with check (false);
+  end if;
+end $$;
