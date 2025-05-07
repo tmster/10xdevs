@@ -49,24 +49,16 @@ export function FlashcardsIndexView() {
   return (
     <ErrorBoundary>
       <div className="container mx-auto py-6 space-y-6">
-        <Header
-          onCreateClick={() => setIsCreateDialogOpen(true)}
-          onFilterChange={setFilters}
-          filters={filters}
-        />
+        <Header onCreateClick={() => setIsCreateDialogOpen(true)} onFilterChange={setFilters} filters={filters} />
 
-        {error && (
-          <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">
-            {error}
-          </div>
-        )}
+        {error && <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md">{error}</div>}
 
         <FlashcardsList
           flashcards={flashcards}
           pagination={pagination}
           onPageChange={setPage}
           onEdit={handleEdit}
-          onDelete={id => setDeleteFlashcardId(id)}
+          onDelete={(id) => setDeleteFlashcardId(id)}
           onSelect={handleSelect}
           selectedIds={selectedIds}
           isLoading={isLoading}

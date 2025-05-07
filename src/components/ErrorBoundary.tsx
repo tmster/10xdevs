@@ -1,6 +1,6 @@
-import React from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // You could log the error to an error reporting service here
-    console.error('Error caught by boundary:', error, errorInfo);
+    console.error("Error caught by boundary:", error, errorInfo);
   }
 
   handleRetry = () => {
@@ -36,9 +36,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
         <Alert variant="destructive" className="my-4">
           <AlertTitle>Something went wrong</AlertTitle>
           <AlertDescription className="space-y-4">
-            <p>
-              {this.state.error?.message || 'An unexpected error occurred'}
-            </p>
+            <p>{this.state.error?.message || "An unexpected error occurred"}</p>
             <Button onClick={this.handleRetry} variant="outline">
               Try Again
             </Button>

@@ -1,5 +1,5 @@
-import { expect } from '@playwright/test';
-import type { Page, Locator } from '@playwright/test';
+import { expect } from "@playwright/test";
+import type { Page, Locator } from "@playwright/test";
 
 /**
  * Page Object Model for the Home page
@@ -13,16 +13,16 @@ export class HomePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.headingAudit = page.locator('#header-left').getByText('Audit');
-    this.navLinks = page.locator('nav a');
-    this.footer = page.locator('footer');
+    this.headingAudit = page.locator("#header-left").getByText("Audit");
+    this.navLinks = page.locator("nav a");
+    this.footer = page.locator("footer");
   }
 
   /**
    * Navigate to the home page
    */
   async goto() {
-    await this.page.goto('/');
+    await this.page.goto("/");
   }
 
   /**

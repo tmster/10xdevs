@@ -1,6 +1,6 @@
 // Mock komponentu GenerationForm
-import React, { useState, useEffect } from 'react';
-import type { CreateGenerationResponse } from '@/types';
+import React, { useState, useEffect } from "react";
+import type { CreateGenerationResponse } from "@/types";
 
 interface GenerationFormProps {
   onSubmit: (text: string, maxCards: number) => Promise<CreateGenerationResponse | null>;
@@ -8,7 +8,7 @@ interface GenerationFormProps {
 }
 
 export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [maxCards, setMaxCards] = useState(5);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -22,7 +22,9 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
       if (text.length < minChars) {
         setValidationError(`Please enter at least ${minChars} characters (${minChars - text.length} more needed)`);
       } else if (text.length > maxChars) {
-        setValidationError(`Text is too long. Maximum ${maxChars} characters allowed (${text.length - maxChars} over limit)`);
+        setValidationError(
+          `Text is too long. Maximum ${maxChars} characters allowed (${text.length - maxChars} over limit)`
+        );
       } else {
         setValidationError(null);
       }
@@ -40,10 +42,10 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
 
     try {
       await onSubmit(text, maxCards);
-      setText('');
+      setText("");
       setMaxCards(5);
     } catch (error) {
-      // Obsługa błędu API
+      console.error(error);
     }
   };
 
@@ -104,19 +106,14 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
         </p>
       </div>
 
-      <button
-        type="submit"
-        disabled={!isValidLength || isLoading}
-        aria-busy={isLoading}
-        className="w-full sm:w-auto"
-      >
+      <button type="submit" disabled={!isValidLength || isLoading} aria-busy={isLoading} className="w-full sm:w-auto">
         {isLoading ? (
           <>
             <span className="loading loading-spinner loading-sm mr-2" aria-hidden="true" />
             Generating...
           </>
         ) : (
-          'Generate Flashcards'
+          "Generate Flashcards"
         )}
       </button>
     </form>

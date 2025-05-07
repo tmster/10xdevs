@@ -32,10 +32,7 @@ export function ResetPasswordForm() {
           </AlertDescription>
         </Alert>
         <div className="text-center">
-          <a
-            href="/login"
-            className="font-medium text-primary hover:text-primary/90"
-          >
+          <a href="/login" className="font-medium text-primary hover:text-primary/90">
             Return to login
           </a>
         </div>
@@ -62,9 +59,7 @@ export function ResetPasswordForm() {
           required
           minLength={8}
         />
-        <p className="text-xs text-muted-foreground">
-          Password must be at least 8 characters long
-        </p>
+        <p className="text-xs text-muted-foreground">Password must be at least 8 characters long</p>
       </div>
 
       <div className="space-y-2">
@@ -80,19 +75,12 @@ export function ResetPasswordForm() {
         />
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Resetting..." : "Reset Password"}
       </Button>
 
       <div className="text-center text-sm mt-4">
-        <a
-          href="/login"
-          className="font-medium text-primary hover:text-primary/90"
-        >
+        <a href="/login" className="font-medium text-primary hover:text-primary/90">
           Back to login
         </a>
       </div>

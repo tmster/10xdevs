@@ -1,26 +1,25 @@
-import { test, expect } from '@playwright/test';
-import { GenerationPage } from './pages/generation-page';
-import { LoginPage } from './pages/login-page';
-import fs from 'fs';
-import path from 'path';
+import { test, expect } from "@playwright/test";
+import { GenerationPage } from "./pages/generation-page";
+import { LoginPage } from "./pages/login-page";
 
 // Set longer timeout for all tests in this file
 test.setTimeout(60000);
 
 // Get auth credentials from environment variables
-const E2E_USERNAME = process.env.E2E_USERNAME || 'test@example.com';
-const E2E_PASSWORD = process.env.E2E_PASSWORD || 'password123';
+const E2E_USERNAME = process.env.E2E_USERNAME || "test@example.com";
+const E2E_PASSWORD = process.env.E2E_PASSWORD || "password123";
 
-test.describe('Flashcard Generation', () => {
+test.describe("Flashcard Generation", () => {
   let generationPage: GenerationPage;
   let loginPage: LoginPage;
-  let hasApiKeyIssue = false;
+  const hasApiKeyIssue = false;
 
   test.beforeEach(async ({ page }) => {
     // Setup custom page error handling
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
-        console.log(`Browser console error: ${msg.text()}`);
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        // Log browser console errors to test output
+        void msg.text(); // Access the text but don't log it
       }
     });
 
@@ -35,7 +34,7 @@ test.describe('Flashcard Generation', () => {
     await generationPage.goto();
   });
 
-  test('should show the flashcard generation form', async ({ page }) => {
+  test("should show the flashcard generation form", async () => {
     // Verify generation form is visible
     await expect(generationPage.generationForm).toBeVisible({ timeout: 5000 });
     await expect(generationPage.textInput).toBeVisible({ timeout: 5000 });
@@ -43,15 +42,15 @@ test.describe('Flashcard Generation', () => {
     await expect(generationPage.generateButton).toBeVisible({ timeout: 5000 });
   });
 
-  test('should show validation error with insufficient text', async ({ page }) => {
+  test("should show validation error with insufficient text", async () => {
     // Try to generate with too short text
-    await generationPage.textInput.fill('This is a short text');
-    await page.waitForTimeout(500); // Wait for UI to update
+    await generationPage.textInput.fill("This is a short text");
+    await generationPage.page.waitForTimeout(500); // Wait for UI to update
 
     await expect(generationPage.generateButton).toBeVisible({ timeout: 5000 });
 
     // Wait for the validation error to appear
-    await page.waitForTimeout(1000);
+    await generationPage.page.waitForTimeout(1000);
 
     // Check if either the explicit validation error appears OR the button remains disabled
     const isErrorVisible = await generationPage.validationError.isVisible().catch(() => false);
@@ -61,7 +60,7 @@ test.describe('Flashcard Generation', () => {
     expect(isErrorVisible || isButtonDisabled).toBeTruthy();
   });
 
-  test('should generate flashcards from valid text', async ({ page }) => {
+  test("should generate flashcards from valid text", async () => {
     // Skip this test if we have API key issues
     if (hasApiKeyIssue) {
       test.skip();

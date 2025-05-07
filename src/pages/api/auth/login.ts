@@ -7,7 +7,7 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-export const POST: APIRoute = async ({ request, locals, redirect }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Parse request body
     const body = await request.json();
@@ -18,7 +18,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: result.error.issues[0].message
+          error: result.error.issues[0].message,
         }),
         { status: 400 }
       );
@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
     const { email, password } = result.data;
 
     // Attempt to sign in
-    const { data, error } = await locals.supabase.auth.signInWithPassword({
+    const { error } = await locals.supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -36,7 +36,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: error.message
+          error: error.message,
         }),
         { status: 400 }
       );
@@ -52,15 +52,15 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
         Location: "/flashcards/list",
         "Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
         Pragma: "no-cache",
-        Expires: "0"
-      }
+        Expires: "0",
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: "An unexpected error occurred during login"
+        error: "An unexpected error occurred during login",
       }),
       { status: 500 }
     );

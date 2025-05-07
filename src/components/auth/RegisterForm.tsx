@@ -47,25 +47,16 @@ export function RegisterForm() {
           required
           minLength={8}
         />
-        <p className="text-xs text-muted-foreground">
-          Password must be at least 8 characters long
-        </p>
+        <p className="text-xs text-muted-foreground">Password must be at least 8 characters long</p>
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Creating account..." : "Create account"}
       </Button>
 
       <div className="text-center text-sm mt-4">
         <span className="text-muted-foreground">Already have an account?</span>{" "}
-        <a
-          href="/login"
-          className="font-medium text-primary hover:text-primary/90"
-        >
+        <a href="/login" className="font-medium text-primary hover:text-primary/90">
           Sign in
         </a>
       </div>

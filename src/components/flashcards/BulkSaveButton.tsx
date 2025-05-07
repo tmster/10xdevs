@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { FlashcardViewModel } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Progress } from '@/components/ui/progress';
+import { Progress } from "@/components/ui/progress";
 import { useApiCall } from "@/hooks/useApiCall";
 
 interface BulkSaveButtonProps {
@@ -12,12 +12,7 @@ interface BulkSaveButtonProps {
   onError: () => void;
 }
 
-export function BulkSaveButton({
-  generationId,
-  flashcards,
-  onSuccess,
-  onError,
-}: BulkSaveButtonProps) {
+export function BulkSaveButton({ generationId, flashcards, onSuccess, onError }: BulkSaveButtonProps) {
   const [error, setError] = useState<string | null>(null);
 
   const { isLoading, execute } = useApiCall<void>();
@@ -28,9 +23,7 @@ export function BulkSaveButton({
       return;
     }
 
-    const acceptedFlashcards = flashcards.filter(
-      (f) => f.status === "accepted"
-    );
+    const acceptedFlashcards = flashcards.filter((f) => f.status === "accepted");
 
     if (acceptedFlashcards.length === 0) {
       setError("No accepted flashcards to save");
@@ -84,9 +77,7 @@ export function BulkSaveButton({
       {isLoading && (
         <div className="space-y-2" data-testid="save-progress-container">
           <Progress value={75} className="w-full" data-testid="save-progress" />
-          <p className="text-sm text-muted-foreground">
-            Saving flashcards... This may take a moment.
-          </p>
+          <p className="text-sm text-muted-foreground">Saving flashcards... This may take a moment.</p>
         </div>
       )}
 

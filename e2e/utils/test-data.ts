@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL!;
@@ -7,7 +7,7 @@ const supabaseKey = process.env.SUPABASE_KEY!;
 // Class to manage test data lifecycle
 export class TestDataManager {
   private supabase;
-  private createdRecords: Map<string, string[]> = new Map();
+  private createdRecords = new Map<string, string[]>();
 
   constructor() {
     this.supabase = createClient(supabaseUrl, supabaseKey);
@@ -24,7 +24,7 @@ export class TestDataManager {
     });
 
     if (signInError) {
-      console.error('Error signing in for test data management:', signInError);
+      console.error("Error signing in for test data management:", signInError);
       throw signInError;
     }
   }
@@ -36,11 +36,7 @@ export class TestDataManager {
    * @returns The inserted record
    */
   async insert<T extends object>(table: string, data: T): Promise<T> {
-    const { data: record, error } = await this.supabase
-      .from(table)
-      .insert(data)
-      .select()
-      .single();
+    const { data: record, error } = await this.supabase.from(table).insert(data).select().single();
 
     if (error) {
       console.error(`Error inserting test data into ${table}:`, error);
@@ -67,10 +63,7 @@ export class TestDataManager {
       for (const [table, ids] of this.createdRecords.entries()) {
         if (ids.length === 0) continue;
 
-        const { error } = await this.supabase
-          .from(table)
-          .delete()
-          .in('id', ids);
+        const { error } = await this.supabase.from(table).delete().in("id", ids);
 
         if (error) {
           console.error(`Error cleaning up test data from ${table}:`, error);
@@ -80,7 +73,7 @@ export class TestDataManager {
       // Clear the tracked records
       this.createdRecords.clear();
     } catch (error) {
-      console.error('Error during test data cleanup:', error);
+      console.error("Error during test data cleanup:", error);
     }
   }
 }

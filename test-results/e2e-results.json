@@ -98,7 +98,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T19:05:52.730Z",
+                      "startTime": "2025-05-07T19:57:49.932Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -125,7 +125,7 @@
         {
           "title": "Flashcard Generation",
           "file": "flashcard-generation.spec.ts",
-          "line": 14,
+          "line": 12,
           "column": 6,
           "specs": [
             {
@@ -144,12 +144,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 5925,
+                      "duration": 5532,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T19:05:52.737Z",
+                      "startTime": "2025-05-07T19:57:49.940Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -159,7 +159,7 @@
               ],
               "id": "e46567f9d80df092973b-e18e5209f8d26093c744",
               "file": "flashcard-generation.spec.ts",
-              "line": 38,
+              "line": 37,
               "column": 3
             },
             {
@@ -178,12 +178,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 7454,
+                      "duration": 7164,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T19:05:52.731Z",
+                      "startTime": "2025-05-07T19:57:49.949Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -193,7 +193,7 @@
               ],
               "id": "e46567f9d80df092973b-658795bb5f9abc6ec268",
               "file": "flashcard-generation.spec.ts",
-              "line": 46,
+              "line": 45,
               "column": 3
             },
             {
@@ -212,16 +212,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 13354,
+                      "duration": 12444,
                       "errors": [],
-                      "stdout": [
-                        {
-                          "text": "Browser console error: Received NaN for the `%s` attribute. If this is expected, cast the value to a string. value\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T19:05:52.741Z",
+                      "startTime": "2025-05-07T19:57:49.938Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -231,7 +227,7 @@
               ],
               "id": "e46567f9d80df092973b-1662b747730c613bdf48",
               "file": "flashcard-generation.spec.ts",
-              "line": 64,
+              "line": 63,
               "column": 3
             }
           ]
@@ -248,7 +244,7 @@
         {
           "title": "Login Page",
           "file": "home.spec.ts",
-          "line": 4,
+          "line": 3,
           "column": 6,
           "specs": [
             {
@@ -267,12 +263,12 @@
                       "workerIndex": 4,
                       "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 530,
+                      "duration": 971,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T19:05:52.730Z",
+                      "startTime": "2025-05-07T19:57:49.937Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -282,7 +278,7 @@
               ],
               "id": "d318381359a9b96acb1e-7ebf5e11f2cd4dfbad41",
               "file": "home.spec.ts",
-              "line": 5,
+              "line": 4,
               "column": 3
             }
           ]
@@ -318,12 +314,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1409,
+                      "duration": 1537,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T19:05:52.746Z",
+                      "startTime": "2025-05-07T19:57:49.954Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -352,12 +348,12 @@
                       "workerIndex": 4,
                       "parallelIndex": 4,
                       "status": "passed",
-                      "duration": 4425,
+                      "duration": 4220,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-04T19:05:53.726Z",
+                      "startTime": "2025-05-07T19:57:51.414Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -377,8 +373,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-04T19:05:49.549Z",
-    "duration": 17894.58,
+    "startTime": "2025-05-07T19:57:48.614Z",
+    "duration": 15179.308,
     "expected": 7,
     "skipped": 0,
     "unexpected": 0,

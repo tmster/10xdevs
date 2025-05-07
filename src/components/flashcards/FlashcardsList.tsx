@@ -90,7 +90,7 @@ export function FlashcardsList({
   });
 
   const editFrontInputRef = useRef<HTMLInputElement>(null);
-  const editButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const editButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Focus management for editing mode
   useEffect(() => {
@@ -140,22 +140,14 @@ export function FlashcardsList({
 
   if (!flashcards?.length) {
     return (
-      <div
-        className="text-center py-8 text-muted-foreground"
-        role="status"
-        aria-label="No flashcards found"
-      >
+      <div className="text-center py-8 text-muted-foreground" role="status" aria-label="No flashcards found">
         No flashcards found
       </div>
     );
   }
 
   return (
-    <div
-      className="space-y-4"
-      role="region"
-      aria-label="Flashcards list"
-    >
+    <div className="space-y-4" role="region" aria-label="Flashcards list">
       <div className="grid gap-4">
         {flashcards.map((flashcard, index) => (
           <Card
@@ -183,35 +175,22 @@ export function FlashcardsList({
                         <Input
                           ref={editFrontInputRef}
                           value={editing.front}
-                          onChange={(e) =>
-                            setEditing((prev) => ({ ...prev, front: e.target.value }))
-                          }
+                          onChange={(e) => setEditing((prev) => ({ ...prev, front: e.target.value }))}
                           placeholder="Front side"
                           aria-label="Front side text"
                         />
                         <Input
                           value={editing.back}
-                          onChange={(e) =>
-                            setEditing((prev) => ({ ...prev, back: e.target.value }))
-                          }
+                          onChange={(e) => setEditing((prev) => ({ ...prev, back: e.target.value }))}
                           placeholder="Back side"
                           aria-label="Back side text"
                           className="mt-4"
                         />
                         <div className="flex gap-2 mt-4">
-                          <Button
-                            onClick={saveEditing}
-                            size="sm"
-                            aria-label="Save changes"
-                          >
+                          <Button onClick={saveEditing} size="sm" aria-label="Save changes">
                             Save
                           </Button>
-                          <Button
-                            onClick={cancelEditing}
-                            variant="outline"
-                            size="sm"
-                            aria-label="Cancel editing"
-                          >
+                          <Button onClick={cancelEditing} variant="outline" size="sm" aria-label="Cancel editing">
                             Cancel
                           </Button>
                         </div>
@@ -220,20 +199,18 @@ export function FlashcardsList({
                   ) : (
                     <>
                       <div>
-                        <div className="font-medium" id={`front-${flashcard.id}`}>Front</div>
-                        <div
-                          className="text-sm text-muted-foreground"
-                          aria-labelledby={`front-${flashcard.id}`}
-                        >
+                        <div className="font-medium" id={`front-${flashcard.id}`}>
+                          Front
+                        </div>
+                        <div className="text-sm text-muted-foreground" aria-labelledby={`front-${flashcard.id}`}>
                           {flashcard.front}
                         </div>
                       </div>
                       <div>
-                        <div className="font-medium" id={`back-${flashcard.id}`}>Back</div>
-                        <div
-                          className="text-sm text-muted-foreground"
-                          aria-labelledby={`back-${flashcard.id}`}
-                        >
+                        <div className="font-medium" id={`back-${flashcard.id}`}>
+                          Back
+                        </div>
+                        <div className="text-sm text-muted-foreground" aria-labelledby={`back-${flashcard.id}`}>
                           {flashcard.back}
                         </div>
                       </div>
@@ -268,11 +245,7 @@ export function FlashcardsList({
       </div>
 
       {totalPages > 1 && (
-        <nav
-          role="navigation"
-          aria-label="Flashcards pagination"
-          className="mt-6"
-        >
+        <nav role="navigation" aria-label="Flashcards pagination" className="mt-6">
           <Pagination className="justify-center">
             <PaginationContent>
               <PaginationItem>

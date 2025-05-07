@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 interface ApiCallOptions<T> {
   onSuccess?: (data: T) => void;
@@ -20,18 +20,10 @@ export function useApiCall<T>() {
     isLoading: false,
   });
 
-  const execute = useCallback(async (
-    apiCall: () => Promise<T>,
-    options: ApiCallOptions<T> = {}
-  ) => {
-    const {
-      onSuccess,
-      onError,
-      retryCount = 3,
-      retryDelay = 1000,
-    } = options;
+  const execute = useCallback(async (apiCall: () => Promise<T>, options: ApiCallOptions<T> = {}) => {
+    const { onSuccess, onError, retryCount = 3, retryDelay = 1000 } = options;
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     let attempts = 0;
     let lastError: Error | null = null;
@@ -39,21 +31,21 @@ export function useApiCall<T>() {
     while (attempts < retryCount) {
       try {
         const data = await apiCall();
-        setState(prev => ({ ...prev, data, isLoading: false, error: null }));
+        setState((prev) => ({ ...prev, data, isLoading: false, error: null }));
         onSuccess?.(data);
         return data;
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error occurred');
+        lastError = error instanceof Error ? error : new Error("Unknown error occurred");
         attempts++;
 
         if (attempts === retryCount) {
-          setState(prev => ({ ...prev, error: lastError, isLoading: false }));
+          setState((prev) => ({ ...prev, error: lastError, isLoading: false }));
           onError?.(lastError);
           break;
         }
 
         // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, retryDelay * attempts));
+        await new Promise((resolve) => setTimeout(resolve, retryDelay * attempts));
       }
     }
 

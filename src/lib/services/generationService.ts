@@ -34,10 +34,7 @@ export class GenerationService {
 
     try {
       // Generate flashcards using AI
-      const flashcards = await this.flashcardGenerator.generateFlashcards(
-        input.text,
-        input.options.max_cards
-      );
+      const flashcards = await this.flashcardGenerator.generateFlashcards(input.text, input.options.max_cards);
 
       // Insert generated flashcards
       const { error: flashcardsError } = await this.supabase.from("flashcards").insert(

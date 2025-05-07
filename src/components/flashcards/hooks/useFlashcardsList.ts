@@ -23,7 +23,7 @@ interface UseFlashcardsListReturn {
 
 const DEFAULT_FILTERS: FlashcardsListFilters = {
   sort: "created_at",
-  order: "desc"
+  order: "desc",
 };
 
 const PER_PAGE = 10;
@@ -33,7 +33,7 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
   const [pagination, setPagination] = useState({
     page: 1,
     perPage: PER_PAGE,
-    total: 0
+    total: 0,
   });
   const [filters, setFilters] = useState<FlashcardsListFilters>(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -52,7 +52,7 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
         sort: filters.sort,
         order: filters.order,
         ...(filters.status && { status: filters.status }),
-        ...(filters.source && { source: filters.source })
+        ...(filters.source && { source: filters.source }),
       });
 
       const response = await fetch(`/api/flashcards?${queryParams}`);
@@ -60,9 +60,9 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
 
       const data = await response.json();
       setFlashcards(data.data);
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
-        total: data.pagination.total
+        total: data.pagination.total,
       }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -83,7 +83,7 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
       const response = await fetch("/api/flashcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) throw new Error("Failed to create flashcard");
@@ -100,15 +100,13 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
       const response = await fetch(`/api/flashcards/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) throw new Error("Failed to update flashcard");
 
       // Optimistic update
-      setFlashcards(prev =>
-        prev.map(card => card.id === id ? { ...card, ...data } : card)
-      );
+      setFlashcards((prev) => prev.map((card) => (card.id === id ? { ...card, ...data } : card)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update flashcard");
       throw err;
@@ -119,14 +117,14 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
     try {
       setError(null);
       const response = await fetch(`/api/flashcards/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
       });
 
       if (!response.ok) throw new Error("Failed to delete flashcard");
 
       // Optimistic update
-      setFlashcards(prev => prev.filter(card => card.id !== id));
-      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
+      setFlashcards((prev) => prev.filter((card) => card.id !== id));
+      setSelectedIds((prev) => prev.filter((selectedId) => selectedId !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete flashcard");
       throw err;
@@ -134,16 +132,14 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
   };
 
   const handleSelect = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const isSelected = prev.includes(id);
-      return isSelected
-        ? prev.filter(selectedId => selectedId !== id)
-        : [...prev, id];
+      return isSelected ? prev.filter((selectedId) => selectedId !== id) : [...prev, id];
     });
   };
 
   const setPage = (page: number) => {
-    setPagination(prev => ({ ...prev, page }));
+    setPagination((prev) => ({ ...prev, page }));
   };
 
   return {
@@ -158,6 +154,6 @@ export function useFlashcardsList(): UseFlashcardsListReturn {
     handleCreate,
     handleEdit,
     handleDelete,
-    handleSelect
+    handleSelect,
   };
 }

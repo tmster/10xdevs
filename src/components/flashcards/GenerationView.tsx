@@ -17,14 +17,10 @@ export function GenerationView() {
   const {
     isLoading: isGenerating,
     error: generationError,
-    execute: executeGeneration
+    execute: executeGeneration,
   } = useApiCall<CreateGenerationResponse>();
 
-  const {
-    isLoading: isSaving,
-    error: saveError,
-    execute: executeSave
-  } = useApiCall<void>();
+  const { isLoading: isSaving, error: saveError, execute: executeSave } = useApiCall<void>();
 
   const handleGeneration = async (text: string, maxCards: number) => {
     const response = await executeGeneration(
@@ -52,7 +48,7 @@ export function GenerationView() {
           toast.error("Error", {
             description: error.message,
           });
-        }
+        },
       }
     );
 
@@ -61,9 +57,7 @@ export function GenerationView() {
 
   const handleEdit = async (id: string, data: UpdateFlashcardCommand) => {
     const status = data.status as FlashcardStatus;
-    setFlashcards((cards) =>
-      cards.map((card) => (card.id === id ? { ...card, ...data, status } : card))
-    );
+    setFlashcards((cards) => cards.map((card) => (card.id === id ? { ...card, ...data, status } : card)));
   };
 
   const handleDelete = (id: string) => {
@@ -72,21 +66,19 @@ export function GenerationView() {
   };
 
   const handleFlashcardSelect = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const isSelected = prev.includes(id);
-      return isSelected
-        ? prev.filter(selectedId => selectedId !== id)
-        : [...prev, id];
+      return isSelected ? prev.filter((selectedId) => selectedId !== id) : [...prev, id];
     });
 
     // Update the flashcard status when selected/deselected
-    setFlashcards(cards =>
-      cards.map(card => {
+    setFlashcards((cards) =>
+      cards.map((card) => {
         if (card.id === id) {
           const isSelected = !selectedIds.includes(id);
           return {
             ...card,
-            status: isSelected ? "accepted" as const : "pending" as const
+            status: isSelected ? ("accepted" as const) : ("pending" as const),
           };
         }
         return card;
@@ -149,7 +141,7 @@ export function GenerationView() {
             />
             <BulkSaveButton
               generationId={generationId!}
-              flashcards={flashcards.filter(f => selectedIds.includes(f.id))}
+              flashcards={flashcards.filter((f) => selectedIds.includes(f.id))}
               onSuccess={handleSaveSuccess}
               onError={handleSaveError}
             />

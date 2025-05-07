@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { CreateGenerationResponse } from '@/types';
+import { useState, useEffect } from "react";
+import type { CreateGenerationResponse } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ interface GenerationFormProps {
 }
 
 export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [maxCards, setMaxCards] = useState(5);
   const [validationError, setValidationError] = useState<string | null>(null);
   const { handleApiError } = useApiError();
@@ -30,7 +30,9 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
       if (text.length < minChars) {
         setValidationError(`Please enter at least ${minChars} characters (${minChars - text.length} more needed)`);
       } else if (text.length > maxChars) {
-        setValidationError(`Text is too long. Maximum ${maxChars} characters allowed (${text.length - maxChars} over limit)`);
+        setValidationError(
+          `Text is too long. Maximum ${maxChars} characters allowed (${text.length - maxChars} over limit)`
+        );
       } else {
         setValidationError(null);
       }
@@ -48,7 +50,7 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
 
     try {
       await onSubmit(text, maxCards);
-      setText('');
+      setText("");
       setMaxCards(5);
     } catch (error) {
       handleApiError(error);
@@ -56,7 +58,12 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" aria-label="Generate flashcards form" data-testid="generation-form">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6"
+      aria-label="Generate flashcards form"
+      data-testid="generation-form"
+    >
       <div className="space-y-2">
         <Label htmlFor="text" className="text-base">
           Text for Flashcard Generation
@@ -129,7 +136,7 @@ export function GenerationForm({ onSubmit, isLoading }: GenerationFormProps) {
             Generating...
           </>
         ) : (
-          'Generate Flashcards'
+          "Generate Flashcards"
         )}
       </Button>
     </form>

@@ -11,8 +11,8 @@ export class ServiceFactory {
   private constructor() {
     this.openRouter = new OpenRouterService({
       apiKey: import.meta.env.OPENROUTER_API_KEY,
-      defaultModel: 'openai/gpt-4o-mini',
-      defaultSystemMessage: 'You are a helpful AI assistant that creates high-quality flashcards.'
+      defaultModel: "openai/gpt-4o-mini",
+      defaultSystemMessage: "You are a helpful AI assistant that creates high-quality flashcards.",
     });
 
     this.flashcardGenerator = new FlashcardGenerationService(this.openRouter);

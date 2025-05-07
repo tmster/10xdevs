@@ -1,8 +1,8 @@
-import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
-import path from 'path';
+import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
+dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
 
 /**
  * Read environment variables from file.
@@ -14,7 +14,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: "./e2e",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -24,42 +24,39 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['html'],
-    ['json', { outputFile: 'test-results/e2e-results.json' }],
-  ],
+  reporter: [["html"], ["json", { outputFile: "test-results/e2e-results.json" }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BASE_URL || 'http://localhost:3001',
+    baseURL: process.env.BASE_URL || "http://localhost:3001",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: "on-first-retry",
     /* Take screenshot on failure */
-    screenshot: 'only-on-failure',
+    screenshot: "only-on-failure",
     /* Record video on failure */
-    video: 'on-first-retry',
+    video: "on-first-retry",
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev:e2e',
-    url: 'http://localhost:3001',
+    command: "npm run dev:e2e",
+    url: "http://localhost:3001",
     reuseExistingServer: !process.env.CI,
-    stdout: 'pipe',
-    stderr: 'pipe',
+    stdout: "pipe",
+    stderr: "pipe",
     timeout: 120000,
   },
 
   /* Global setup and teardown */
-  globalSetup: './e2e/global-setup.ts',
-  globalTeardown: './e2e/global-teardown.ts',
+  globalSetup: "./e2e/global-setup.ts",
+  globalTeardown: "./e2e/global-teardown.ts",
 });

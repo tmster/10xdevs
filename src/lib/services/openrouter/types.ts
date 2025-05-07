@@ -1,12 +1,12 @@
 export interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
 }
 
 export interface ResponseFormat {
-  type: 'json_object';
+  type: "json_object";
   schema: {
-    type: 'object';
+    type: "object";
     properties: Record<string, unknown>;
     required?: string[];
     additionalProperties?: boolean;
@@ -47,9 +47,9 @@ export interface OpenRouterAPIResponse {
   id: string;
   model: string;
   created: number;
-  choices: Array<{
+  choices: {
     message: {
       content: string | Record<string, unknown>;
     };
-  }>;
+  }[];
 }

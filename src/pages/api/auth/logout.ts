@@ -10,13 +10,13 @@ export const POST: APIRoute = async ({ locals, redirect }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: error.message
+          error: error.message,
         }),
         {
           status: 400,
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
     }
@@ -28,8 +28,8 @@ export const POST: APIRoute = async ({ locals, redirect }) => {
         Location: "/login",
         "Cache-Control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
         Pragma: "no-cache",
-        Expires: "0"
-      }
+        Expires: "0",
+      },
     });
   } catch (error) {
     console.error("Logout error:", error);

@@ -1,7 +1,7 @@
-import { OpenRouterService } from './index';
-import { flashcardGenerationSchema } from './flashcard.schema';
-import type { GeneratedFlashcardDTO } from '../../../types';
-import { OpenRouterError } from './errors';
+import { OpenRouterService } from "./index";
+import { flashcardGenerationSchema } from "./flashcard.schema";
+import type { GeneratedFlashcardDTO } from "../../../types";
+import { OpenRouterError } from "./errors";
 
 export class FlashcardGenerationService {
   constructor(private readonly openRouter: OpenRouterService) {}
@@ -19,68 +19,58 @@ IMPORTANT: Your response must be a valid JSON object with a 'flashcards' array c
       const response = await this.openRouter.createChatCompletion({
         messages: [
           {
-            role: 'user',
-            content: `Please create ${maxCards} flashcards from the following text. Format your response as a JSON object with a 'flashcards' array:\n\n${text}`
-          }
+            role: "user",
+            content: `Please create ${maxCards} flashcards from the following text. Format your response as a JSON object with a 'flashcards' array:\n\n${text}`,
+          },
         ],
         systemMessage,
         responseFormat: flashcardGenerationSchema,
-        temperature: 0.7
+        temperature: 0.7,
       });
 
-      console.log('OpenRouter response:', response);
+      console.log("OpenRouter response:", response);
 
       let parsedResponse;
-      if (typeof response.response === 'string') {
+      if (typeof response.response === "string") {
         try {
-          console.log('Parsing response as JSON:', response.response);
-
+          console.log("Parsing response as JSON:", response.response);
 
           parsedResponse = JSON.parse(response.response);
         } catch (e) {
-          console.error('Failed to parse response as JSON:', response.response.response);
-          throw new OpenRouterError(
-            'Invalid response: response is not a valid JSON',
-            'INVALID_RESPONSE'
-          );
+          console.error("Failed to parse response as JSON:", response.response.response);
+          throw new OpenRouterError("Invalid response: response is not a valid JSON", "INVALID_RESPONSE");
         }
       } else {
         parsedResponse = response.response;
       }
 
-      console.log('Parsed response:', parsedResponse);
+      console.log("Parsed response:", parsedResponse);
 
-      if (!parsedResponse || typeof parsedResponse !== 'object') {
-        throw new OpenRouterError(
-          'Invalid response: response must be an object',
-          'INVALID_RESPONSE'
-        );
+      if (!parsedResponse || typeof parsedResponse !== "object") {
+        throw new OpenRouterError("Invalid response: response must be an object", "INVALID_RESPONSE");
       }
 
       const { flashcards } = parsedResponse;
 
       if (!Array.isArray(flashcards)) {
-        console.error('Invalid flashcards format:', parsedResponse);
-        throw new OpenRouterError(
-          'Invalid response: flashcards must be an array',
-          'INVALID_RESPONSE'
-        );
+        console.error("Invalid flashcards format:", parsedResponse);
+        throw new OpenRouterError("Invalid response: flashcards must be an array", "INVALID_RESPONSE");
       }
 
       if (flashcards.length !== maxCards) {
         throw new OpenRouterError(
           `Invalid response: expected ${maxCards} flashcards but got ${flashcards.length}`,
-          'INVALID_RESPONSE'
+          "INVALID_RESPONSE"
         );
       }
 
       const now = new Date().toISOString();
       return flashcards.map((card, index) => {
-        if (!card.front || !card.back || typeof card.front !== 'string' || typeof card.back !== 'string') {
+        if (!card.front || !card.back || typeof card.front !== "string" || typeof card.back !== "string") {
           console.error(`Invalid flashcard at index ${index}:`, card);
           throw new OpenRouterError(
-            'Invalid response: each flashcard must have front and back content as strings',
-            'INVALID_RESPONSE'
+            "Invalid response: each flashcard must have front and back content as strings",
+            "INVALID_RESPONSE"
           );
         }
 
@@ -88,14 +78,14 @@ IMPORTANT: Your response must be a valid JSON object with a 'flashcards' array c
           id: crypto.randomUUID(),
           front: card.front.trim(),
           back: card.back.trim(),
-          status: 'pending' as const,
-          source: 'ai-full' as const,
+          status: "pending" as const,
+          source: "ai-full" as const,
           created_at: now,
-          updated_at: now
+          updated_at: now,
         };
       });
     } catch (error) {
-      console.error('Flashcard generation error:', error);
+      console.error("Flashcard generation error:", error);
       throw error;
     }
   }

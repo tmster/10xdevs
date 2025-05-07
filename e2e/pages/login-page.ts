@@ -1,9 +1,9 @@
-import { expect } from '@playwright/test';
-import type { Page, Locator } from '@playwright/test';
+import { expect } from "@playwright/test";
+import type { Page, Locator } from "@playwright/test";
 
 // Get auth credentials from environment variables
-const E2E_USERNAME = process.env.E2E_USERNAME || 'test@example.com';
-const E2E_PASSWORD = process.env.E2E_PASSWORD || 'password123';
+const E2E_USERNAME = process.env.E2E_USERNAME || "test@example.com";
+const E2E_PASSWORD = process.env.E2E_PASSWORD || "password123";
 
 /**
  * Page Object Model for the Login page
@@ -22,7 +22,9 @@ export class LoginPage {
     this.loginForm = page.locator('form, form[action*="login"], [data-testid="login-form"]');
     this.emailInput = page.locator('input[type="email"], input[name="email"], [data-testid="email-input"]');
     this.passwordInput = page.locator('input[type="password"], input[name="password"], [data-testid="password-input"]');
-    this.loginButton = page.locator('button[type="submit"], button:has-text("Log in"), button:has-text("Sign in"), [data-testid="login-button"]');
+    this.loginButton = page.locator(
+      'button[type="submit"], button:has-text("Log in"), button:has-text("Sign in"), [data-testid="login-button"]'
+    );
     this.errorMessage = page.locator('div[role="alert"], .error, .error-message, [data-testid="login-error"]');
   }
 
@@ -30,8 +32,8 @@ export class LoginPage {
    * Navigate to the login page
    */
   async goto() {
-    await this.page.goto('/login');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.goto("/login");
+    await this.page.waitForLoadState("networkidle");
 
     // Wait for the URL to update
     try {
@@ -55,9 +57,9 @@ export class LoginPage {
     const dashboard = this.page.locator('h1:has-text("Dashboard"), [data-testid="dashboard"]');
 
     const isLoggedIn =
-      await logoutButton.isVisible().catch(() => false) ||
-      await userMenu.isVisible().catch(() => false) ||
-      await dashboard.isVisible().catch(() => false);
+      (await logoutButton.isVisible().catch(() => false)) ||
+      (await userMenu.isVisible().catch(() => false)) ||
+      (await dashboard.isVisible().catch(() => false));
 
     return isLoggedIn;
   }
@@ -73,15 +75,16 @@ export class LoginPage {
     }
 
     // Ensure login form is visible
-    await expect(this.loginForm).toBeVisible({ timeout: 10000 })
+    await expect(this.loginForm)
+      .toBeVisible({ timeout: 10000 })
       .catch(async () => {
         // Try to identify form even if not matching our selectors
-        const anyForm = this.page.locator('form');
+        const anyForm = this.page.locator("form");
         const formCount = await anyForm.count();
         if (formCount > 0) {
           // Continue with login attempt even if we can't find our specific form
         } else {
-          throw new Error('No login form found on the page');
+          throw new Error("No login form found on the page");
         }
       });
 
@@ -103,7 +106,7 @@ export class LoginPage {
       this.loginButton.click(),
       this.page.waitForNavigation({ timeout: 30000 }).catch(() => {
         // Continue if navigation times out
-      })
+      }),
     ]);
 
     // Wait for some authenticated content to appear

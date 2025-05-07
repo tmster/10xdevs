@@ -18,11 +18,7 @@ interface CreateFlashcardDialogProps {
   onCreate: (data: CreateFlashcardCommand) => Promise<void>;
 }
 
-export function CreateFlashcardDialog({
-  isOpen,
-  onClose,
-  onCreate,
-}: CreateFlashcardDialogProps) {
+export function CreateFlashcardDialog({ isOpen, onClose, onCreate }: CreateFlashcardDialogProps) {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,18 +77,11 @@ export function CreateFlashcardDialog({
                 disabled={isSubmitting}
               />
             </div>
-            {error && (
-              <div className="text-sm text-destructive">{error}</div>
-            )}
+            {error && <div className="text-sm text-destructive">{error}</div>}
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>

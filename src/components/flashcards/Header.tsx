@@ -1,11 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { FlashcardsListFilters } from "./FlashcardsIndexView";
 
 /**
@@ -44,7 +39,7 @@ export function Header({ onCreateClick, onFilterChange, filters }: HeaderProps) 
   const handleFilterChange = (key: keyof FlashcardsListFilters, value: string) => {
     onFilterChange({
       ...filters,
-      [key]: value === "all" ? undefined : value
+      [key]: value === "all" ? undefined : value,
     });
   };
 
@@ -52,19 +47,12 @@ export function Header({ onCreateClick, onFilterChange, filters }: HeaderProps) 
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl font-bold">Flashcards</CardTitle>
-        <Button
-          onClick={onCreateClick}
-          aria-label="Create new flashcard"
-        >
+        <Button onClick={onCreateClick} aria-label="Create new flashcard">
           Create Flashcard
         </Button>
       </CardHeader>
       <CardContent>
-        <div
-          className="flex flex-wrap gap-4"
-          role="search"
-          aria-label="Flashcard filters"
-        >
+        <div className="flex flex-wrap gap-4" role="search" aria-label="Flashcard filters">
           <Select
             value={filters.status || "all"}
             onValueChange={(value) => handleFilterChange("status", value)}
@@ -104,7 +92,7 @@ export function Header({ onCreateClick, onFilterChange, filters }: HeaderProps) 
               onFilterChange({
                 ...filters,
                 sort: sort as "created_at" | "updated_at",
-                order: order as "asc" | "desc"
+                order: order as "asc" | "desc",
               });
             }}
             aria-label="Sort flashcards"

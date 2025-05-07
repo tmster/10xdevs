@@ -1,5 +1,5 @@
-import { expect } from '@playwright/test';
-import type { Page, Locator } from '@playwright/test';
+import { expect } from "@playwright/test";
+import type { Page, Locator } from "@playwright/test";
 
 /**
  * Page Object Model for the Flashcard Generation page
@@ -28,15 +28,17 @@ export class GenerationPage {
     this.validationError = page.locator('[role="alert"], [data-testid="text-validation-error"]');
     this.loadingSkeleton = page.locator('.skeleton, [data-testid="loading-skeleton"]');
     this.flashcardItems = page.locator('.flashcard-item, [data-testid^="flashcard-item-"]');
-    this.bulkSaveButton = page.getByRole('button', { name: /save selected/i }).or(page.locator('button:has-text("Save Selected")'));
+    this.bulkSaveButton = page
+      .getByRole("button", { name: /save selected/i })
+      .or(page.locator('button:has-text("Save Selected")'));
   }
 
   /**
    * Navigate to the flashcard generation page
    */
   async goto() {
-    await this.page.goto('/flashcards/generate');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.goto("/flashcards/generate");
+    await this.page.waitForLoadState("networkidle");
     await expect(this.generationForm).toBeVisible({ timeout: 10000 });
   }
 
@@ -54,10 +56,10 @@ export class GenerationPage {
 
     try {
       await Promise.race([
-        this.page.waitForSelector('[data-testid="loading-skeleton"]', { state: 'hidden', timeout: 30000 }),
-        this.page.waitForSelector('[data-testid="generated-flashcards"]', { state: 'visible', timeout: 30000 })
+        this.page.waitForSelector('[data-testid="loading-skeleton"]', { state: "hidden", timeout: 30000 }),
+        this.page.waitForSelector('[data-testid="generated-flashcards"]', { state: "visible", timeout: 30000 }),
       ]);
-    } catch (e) {
+    } catch {
       // Continue execution even if timeout occurs
     }
   }
@@ -65,7 +67,7 @@ export class GenerationPage {
   /**
    * Check if flashcards were generated successfully
    */
-  async assertFlashcardsGenerated(expectedCount: number) {
+  async assertFlashcardsGenerated() {
     await expect(this.generatedFlashcards).toBeVisible({ timeout: 15000 });
     await expect(this.flashcardItems.first()).toBeVisible({ timeout: 5000 });
   }
@@ -82,7 +84,7 @@ export class GenerationPage {
     try {
       const checkbox = this.flashcardItems.nth(index).locator('input[type="checkbox"]');
       await checkbox.check();
-    } catch (e) {
+    } catch {
       await this.flashcardItems.nth(index).click();
     }
   }
@@ -105,7 +107,9 @@ export class GenerationPage {
   async saveSelectedFlashcards() {
     const isSaveButtonVisible = await this.bulkSaveButton.isVisible();
     if (!isSaveButtonVisible) {
-      const alternativeButton = this.page.locator('button:has-text("Save"), button:has-text("Submit"), button:has-text("Confirm")');
+      const alternativeButton = this.page.locator(
+        'button:has-text("Save"), button:has-text("Submit"), button:has-text("Confirm")'
+      );
       if (await alternativeButton.isVisible()) {
         await alternativeButton.click();
       }
@@ -116,10 +120,10 @@ export class GenerationPage {
     try {
       await Promise.race([
         this.page.waitForSelector('[role="status"]', { timeout: 10000 }),
-        this.page.waitForSelector('.toast, .notification', { timeout: 10000 }),
-        this.page.waitForNavigation({ timeout: 10000 })
+        this.page.waitForSelector(".toast, .notification", { timeout: 10000 }),
+        this.page.waitForNavigation({ timeout: 10000 }),
       ]);
-    } catch (e) {
+    } catch {
       // Continue execution even if timeout occurs
     }
   }

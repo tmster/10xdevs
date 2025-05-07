@@ -91,22 +91,13 @@ export function LoginForm() {
         />
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-        data-testid="login-submit"
-      >
+      <Button type="submit" className="w-full" disabled={isLoading} data-testid="login-submit">
         {isLoading ? "Signing in..." : "Sign in"}
       </Button>
 
       <div className="text-center text-sm mt-4">
         <span className="text-muted-foreground">Don't have an account?</span>{" "}
-        <a
-          href="/register"
-          className="font-medium text-primary hover:text-primary/90"
-          data-testid="register-link"
-        >
+        <a href="/register" className="font-medium text-primary hover:text-primary/90" data-testid="register-link">
           Sign up
         </a>
       </div>

@@ -21,15 +21,12 @@ export function ForgotPasswordForm() {
       <div className="space-y-4">
         <Alert>
           <AlertDescription>
-            If an account exists with that email, we've sent instructions to reset your password.
-            Please check your inbox.
+            If an account exists with that email, we've sent instructions to reset your password. Please check your
+            inbox.
           </AlertDescription>
         </Alert>
         <div className="text-center">
-          <a
-            href="/login"
-            className="font-medium text-primary hover:text-primary/90"
-          >
+          <a href="/login" className="font-medium text-primary hover:text-primary/90">
             Return to login
           </a>
         </div>
@@ -60,19 +57,12 @@ export function ForgotPasswordForm() {
         </p>
       </div>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Sending..." : "Send reset link"}
       </Button>
 
       <div className="text-center text-sm mt-4">
-        <a
-          href="/login"
-          className="font-medium text-primary hover:text-primary/90"
-        >
+        <a href="/login" className="font-medium text-primary hover:text-primary/90">
           Back to login
         </a>
       </div>

@@ -3,25 +3,25 @@
  */
 
 // Generic response type for consistent error handling
-type ApiResponse<T> = {
+interface ApiResponse<T> {
   data: T | null;
   error: string | null;
   status: number;
-};
+}
 
 /**
  * Fetches users from the API
  */
 export async function getUsers(): Promise<ApiResponse<any[]>> {
   try {
-    const response = await fetch('/api/users');
+    const response = await fetch("/api/users");
     const status = response.status;
 
     if (!response.ok) {
       return {
         data: null,
         error: `Error fetching users: ${status}`,
-        status
+        status,
       };
     }
 
@@ -30,8 +30,8 @@ export async function getUsers(): Promise<ApiResponse<any[]>> {
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      status: 500
+      error: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
     };
   }
 }
@@ -48,7 +48,7 @@ export async function getUserById(id: number): Promise<ApiResponse<any>> {
       return {
         data: null,
         error: `Error fetching user: ${status}`,
-        status
+        status,
       };
     }
 
@@ -57,8 +57,8 @@ export async function getUserById(id: number): Promise<ApiResponse<any>> {
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      status: 500
+      error: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
     };
   }
 }
@@ -68,10 +68,10 @@ export async function getUserById(id: number): Promise<ApiResponse<any>> {
  */
 export async function createUser(userData: { name: string; email: string }): Promise<ApiResponse<any>> {
   try {
-    const response = await fetch('/api/users', {
-      method: 'POST',
+    const response = await fetch("/api/users", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
     });
@@ -83,7 +83,7 @@ export async function createUser(userData: { name: string; email: string }): Pro
       return {
         data: null,
         error: data.error || `Error creating user: ${status}`,
-        status
+        status,
       };
     }
 
@@ -91,8 +91,8 @@ export async function createUser(userData: { name: string; email: string }): Pro
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      status: 500
+      error: error instanceof Error ? error.message : "Unknown error",
+      status: 500,
     };
   }
 }

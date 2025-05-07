@@ -30,32 +30,25 @@ function parseCookieHeader(cookieHeader: string): { name: string; value: string 
 }
 
 // Server-side Supabase client
-export const createSupabaseServerClient = (context: {
-  headers: Headers;
-  cookies: AstroCookies;
-}) => {
-  const supabase = createServerClient<Database>(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookieOptions,
-      cookies: {
-        getAll() {
-          const cookieHeader = context.headers.get("Cookie") || "";
-          return parseCookieHeader(cookieHeader);
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            // When setting cookies, use maxAge for better browser compatibility
-            context.cookies.set(name, value, {
-              ...options,
-              maxAge: options?.maxAge || 60 * 60 * 24 * 7, // 7 days default
-            });
-          });
-        },
+export const createSupabaseServerClient = (context: { headers: Headers; cookies: AstroCookies }) => {
+  const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookieOptions,
+    cookies: {
+      getAll() {
+        const cookieHeader = context.headers.get("Cookie") || "";
+        return parseCookieHeader(cookieHeader);
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          // When setting cookies, use maxAge for better browser compatibility
+          context.cookies.set(name, value, {
+            ...options,
+            maxAge: options?.maxAge || 60 * 60 * 24 * 7, // 7 days default
+          });
+        });
+      },
+    },
+  });
 
   return supabase;
 };

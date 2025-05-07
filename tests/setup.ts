@@ -1,7 +1,7 @@
-import { expect, afterEach, beforeAll, afterAll } from 'vitest';
-import { cleanup } from '@testing-library/react';
-import { setupServer } from 'msw/node';
-import matchers from '@testing-library/jest-dom/matchers';
+import { expect, afterEach, beforeAll, afterAll } from "vitest";
+import { cleanup } from "@testing-library/react";
+import { setupServer } from "msw/node";
+import matchers from "@testing-library/jest-dom/matchers";
 
 // Extend Vitest's expect with Testing Library matchers
 expect.extend(matchers);
@@ -15,7 +15,7 @@ afterEach(() => {
 export const server = setupServer();
 
 // Set up server before tests
-beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }));
 
 // Reset server handlers after each test
 afterEach(() => server.resetHandlers());
@@ -34,8 +34,7 @@ console.error = (...args) => {
   // Ignore specific React errors we expect during testing
   if (
     args[0]?.includes &&
-    (args[0].includes('Warning: ReactDOM.render') ||
-     args[0].includes('Warning: useLayoutEffect'))
+    (args[0].includes("Warning: ReactDOM.render") || args[0].includes("Warning: useLayoutEffect"))
   ) {
     return;
   }
@@ -44,7 +43,7 @@ console.error = (...args) => {
 
 console.warn = (...args) => {
   // Ignore specific warnings if needed
-  if (args[0]?.includes && args[0].includes('Some warning to ignore')) {
+  if (args[0]?.includes && args[0].includes("Some warning to ignore")) {
     return;
   }
   originalConsoleWarn(...args);
