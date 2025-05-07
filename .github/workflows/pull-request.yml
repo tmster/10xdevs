@@ -84,7 +84,7 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-          BASE_URL: ${{ secrets.PUBLIC_SITE_URL || 'http://localhost:3001' }}
+          BASE_URL: ${{ secrets.PUBLIC_SITE_URL || 'http://localhost:3000' }}
         run: |
           echo "Setting up environment variables for E2E tests"
           cp .env.example .env.test
