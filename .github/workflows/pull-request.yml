@@ -87,6 +87,7 @@ jobs:
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           PUBLIC_SITE_URL: ${{ secrets.PUBLIC_SITE_URL }}
+          TEST_VARIABLE: working
           # Set timeouts higher for CI environment
           PLAYWRIGHT_TIMEOUT: 60000
 
