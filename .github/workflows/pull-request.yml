@@ -101,6 +101,7 @@ jobs:
         run: npm run e2e
         env:
           CI: true
+          BASE_URL: ${{ secrets.PUBLIC_SITE_URL || 'http://localhost:3000' }}
           # Set timeouts higher for CI environment
           PLAYWRIGHT_TIMEOUT: 60000
 
