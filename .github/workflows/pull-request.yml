@@ -102,6 +102,11 @@ jobs:
         env:
           CI: true
           BASE_URL: ${{ secrets.PUBLIC_SITE_URL || 'http://localhost:3000' }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           # Set timeouts higher for CI environment
           PLAYWRIGHT_TIMEOUT: 60000
 
