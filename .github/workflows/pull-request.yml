@@ -96,57 +96,6 @@ jobs:
           # Set timeouts higher for CI environment
           PLAYWRIGHT_TIMEOUT: 60000
 
-      - name: Generate Playwright JSON Report
-        if: always()
-        run: |
-          mkdir -p playwright-report
-          # Generate a simplified JSON report based on test results
-          cat > playwright-report/results.json << EOL
-          {
-            "suites": [
-              {
-                "title": "E2E Tests",
-                "specs": $(find test-results -name "*.json" -not -path "*/e2e-results.json" | wc -l | xargs -I{} echo "[$(seq -s, 1 {})]" | sed 's/\[1\]/\[\]/g')
-              }
-            ],
-            "errors": [],
-            "duration": 60000
-          }
-          EOL
-
-          # Add test counts to the report
-          if [ -d "test-results" ]; then
-            TOTAL_TESTS=$(find test-results -name "*.json" -not -path "*/e2e-results.json" | wc -l)
-            # Count tests with result: passed
-            PASSED_TESTS=$(grep -r '"status":"passed"' test-results 2>/dev/null | wc -l || echo 0)
-            echo "Found $PASSED_TESTS passed tests out of $TOTAL_TESTS total tests"
-
-            # Update the JSON with actual test data
-            if [ $TOTAL_TESTS -gt 0 ]; then
-              cat > playwright-report/results.json << EOL
-          {
-            "suites": [
-              {
-                "title": "E2E Tests",
-                "specs": [
-          $(find test-results -name "*.json" -not -path "*/e2e-results.json" | while read file; do
-            PASSED=$(grep -c '"status":"passed"' "$file" || echo "false")
-            echo "          {\"title\": \"Test $file\", \"ok\": $PASSED},"
-          done | sed '$ s/,$//')
-                ]
-              }
-            ],
-            "errors": [],
-            "duration": 60000
-          }
-          EOL
-            fi
-          fi
-
-          # Display the generated file for debugging
-          echo "Generated results.json content:"
-          cat playwright-report/results.json
-
       - name: Upload E2E Test Results
         uses: actions/upload-artifact@v4
         with:
@@ -229,11 +178,10 @@ jobs:
               console.log('Looking for E2E test results...');
 
               const possibleResultPaths = [
-                'e2e-results/playwright-report/results.json',
-                'playwright-report/results.json',
                 'e2e-results/test-results/e2e-results.json',
                 'test-results/e2e-results.json',
-                'e2e-results/results.json'
+                'e2e-results/playwright-report/results.json',
+                'playwright-report/results.json'
               ];
 
               let resultData = null;
@@ -257,66 +205,87 @@ jobs:
 
               if (resultData) {
                 console.log(`Using test results from: ${usedPath}`);
-                console.log(`Result data structure: ${JSON.stringify(Object.keys(resultData))}`);
 
-                // Handle different result formats
-                let passedTests = 0;
-                let totalTests = 0;
-                let durationInMs = 0;
+                // Extract test statistics - first try using the stats section if it exists
+                if (resultData.stats) {
+                  console.log('Found stats section in results file');
+                  const stats = resultData.stats;
 
-                // Handle standard Playwright JSON reporter format
-                if (Array.isArray(safeGet(resultData, 'suites', []))) {
-                  console.log('Found suites array in results');
+                  // Use the stats section for accurate counts
+                  const totalTests = safeGet(stats, 'expected', 0) +
+                                    safeGet(stats, 'unexpected', 0) +
+                                    safeGet(stats, 'skipped', 0) +
+                                    safeGet(stats, 'flaky', 0);
 
-                  resultData.suites.forEach(suite => {
-                    const specs = safeGet(suite, 'specs', []);
-                    console.log(`Suite "${safeGet(suite, 'title', 'unnamed')}" has ${specs.length} specs`);
+                  const passedTests = safeGet(stats, 'expected', 0);
+                  const failedTests = safeGet(stats, 'unexpected', 0);
+                  const skippedTests = safeGet(stats, 'skipped', 0);
+                  const flakyTests = safeGet(stats, 'flaky', 0);
 
-                    if (Array.isArray(specs)) {
-                      totalTests += specs.length;
-                      specs.forEach(spec => {
-                        if (safeGet(spec, 'ok', false) === true ||
-                            safeGet(spec, 'status', '') === 'passed' ||
-                            parseInt(safeGet(spec, 'ok', 0)) > 0) {
-                          passedTests++;
-                        }
-                      });
-                    }
-                  });
+                  // Calculate pass rate
+                  const passRate = totalTests > 0 ?
+                    Math.round((passedTests / totalTests) * 100) : 0;
 
-                  durationInMs = safeGet(resultData, 'duration', 0);
-                }
+                  // Format duration from milliseconds to seconds
+                  const durationMs = safeGet(stats, 'duration', 0);
+                  const duration = (durationMs / 1000).toFixed(2);
 
-                // Alternative format - try to look for test results
-                else if (Array.isArray(safeGet(resultData, 'results', []))) {
-                  console.log('Found results array in data');
-                  const results = resultData.results;
-                  totalTests = results.length;
-                  passedTests = results.filter(r =>
-                    safeGet(r, 'status', '') === 'passed' ||
-                    safeGet(r, 'ok', false) === true
-                  ).length;
-
-                  // Try to find duration info
-                  results.forEach(r => {
-                    durationInMs += safeGet(r, 'duration', 0);
-                  });
-                }
-
-                console.log(`Counted tests: ${passedTests} passed out of ${totalTests} total`);
-
-                // Calculate percentage
-                const passRate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
-
-                // Format duration
-                const durationSeconds = typeof durationInMs === 'number' && !isNaN(durationInMs)
-                  ? (durationInMs / 1000).toFixed(2)
-                  : 'unknown';
-
-                e2eTestInfo = `E2E Test Results:
+                  // Build the test info string
+                  e2eTestInfo = `E2E Test Results:
                 - Passed: ${passedTests}/${totalTests} tests (${passRate}%)
-                - Duration: ${durationSeconds}s
-                - Source: ${usedPath}`;
+                - Failed: ${failedTests}
+                - Skipped: ${skippedTests}
+                - Flaky: ${flakyTests}
+                - Duration: ${duration}s`;
+                }
+                // If no stats section, try to manually count from the nested structure
+                else if (Array.isArray(resultData.suites)) {
+                  console.log('No stats section, scanning nested suite structure');
+
+                  // Function to recursively count specs in nested suites
+                  const countSpecs = (suites) => {
+                    let passed = 0;
+                    let total = 0;
+
+                    const processSpec = (spec) => {
+                      total++;
+                      if (spec.ok === true) {
+                        passed++;
+                      }
+                    };
+
+                    const processSuite = (suite) => {
+                      // Count specs in this suite
+                      if (Array.isArray(suite.specs)) {
+                        suite.specs.forEach(processSpec);
+                      }
+
+                      // Process nested suites
+                      if (Array.isArray(suite.suites)) {
+                        suite.suites.forEach(processSuite);
+                      }
+                    };
+
+                    suites.forEach(processSuite);
+                    return { passed, total };
+                  };
+
+                  const counts = countSpecs(resultData.suites);
+                  const passRate = counts.total > 0 ?
+                    Math.round((counts.passed / counts.total) * 100) : 0;
+
+                  // Try to get duration
+                  const duration = typeof resultData.duration === 'number' ?
+                    (resultData.duration / 1000).toFixed(2) : 'unknown';
+
+                  e2eTestInfo = `E2E Test Results:
+                - Passed: ${counts.passed}/${counts.total} tests (${passRate}%)
+                - Failed: ${counts.total - counts.passed}
+                - Duration: ${duration}s`;
+                }
+                else {
+                  e2eTestInfo = 'E2E test results found but in unexpected format';
+                }
               } else {
                 e2eTestInfo = 'E2E test results not found in any expected location';
               }
