@@ -5,7 +5,7 @@ import type { FlashcardDTO } from "../../types";
 export interface GetFlashcardsOptions {
   limit: number;
   offset: number;
-  status?: "accepted" | "rejected";
+  status?: "accepted" | "rejected" | "pending";
   source?: "ai-full" | "ai-edited" | "manual";
   sort: "created_at" | "updated_at";
   order: "asc" | "desc";

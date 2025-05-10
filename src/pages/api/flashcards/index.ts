@@ -6,7 +6,7 @@ import { FlashcardService } from "../../../lib/services/flashcardService";
 const querySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(20),
   offset: z.coerce.number().min(0).default(0),
-  status: z.enum(["accepted", "rejected"]).optional(),
+  status: z.enum(["accepted", "rejected", "pending"]).optional(),
   source: z.enum(["ai-full", "ai-edited", "manual"]).optional(),
   sort: z.enum(["created_at", "updated_at"]).default("created_at"),
   order: z.enum(["asc", "desc"]).default("desc"),
