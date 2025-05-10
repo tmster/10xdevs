@@ -166,3 +166,17 @@ export type FlashcardViewModel = Omit<GeneratedFlashcardDTO, "status"> & {
   status: FlashcardStatus;
   isEditing?: boolean;
 };
+
+// View model for dashboard
+export interface DashboardViewModel {
+  user: {
+    username: string;
+    lastLoginDate: Date;
+  };
+  stats: StatisticsDTO;
+  currentFlashcard: FlashcardViewModel | null;
+  pendingFlashcards: {
+    count: number;
+    items: FlashcardViewModel[];
+  };
+}
