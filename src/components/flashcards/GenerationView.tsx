@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { FlashcardViewModel, CreateGenerationResponse, UpdateFlashcardCommand, FlashcardStatus } from "@/types";
+import type { FlashcardViewModel, CreateGenerationResponse, UpdateFlashcardCommand, FlashcardStatus, FlashcardDTO } from "@/types";
 import { GenerationForm } from "./GenerationForm";
 import { FlashcardsList } from "./FlashcardsList";
 import { BulkSaveButton } from "./BulkSaveButton";
@@ -41,7 +41,8 @@ export function GenerationView() {
       {
         onSuccess: (data) => {
           setGenerationId(data.generation_id);
-          setFlashcards(data.flashcards.map((card) => ({ ...card, status: "pending" })));
+          setFlashcards(data.flashcards.map((card) => ({ ...card, status: "pending" as FlashcardStatus })));
+          setSelectedIds([]); // Reset selected IDs when new flashcards are generated
           toast.success("Flashcards generated successfully!");
         },
         onError: (error) => {
@@ -55,9 +56,36 @@ export function GenerationView() {
     return response;
   };
 
+  // Handle editing a flashcard
   const handleEdit = async (id: string, data: UpdateFlashcardCommand) => {
-    const status = data.status as FlashcardStatus;
-    setFlashcards((cards) => cards.map((card) => (card.id === id ? { ...card, ...data, status } : card)));
+    setFlashcards((prevCards) =>
+      prevCards.map((card) => {
+        if (card.id === id) {
+          // Make a copy of the original card
+          const updatedCard = { ...card };
+
+          // Update front and back if provided
+          if (data.front !== undefined) {
+            updatedCard.front = data.front;
+          }
+
+          if (data.back !== undefined) {
+            updatedCard.back = data.back;
+          }
+
+          // Update status if provided, ensuring it's properly typed
+          if (data.status !== undefined) {
+            // Type guard to ensure status is a valid FlashcardStatus
+            if (data.status === "accepted" || data.status === "rejected" || data.status === "pending") {
+              updatedCard.status = data.status;
+            }
+          }
+
+          return updatedCard;
+        }
+        return card;
+      })
+    );
   };
 
   const handleDelete = (id: string) => {
@@ -75,10 +103,10 @@ export function GenerationView() {
     setFlashcards((cards) =>
       cards.map((card) => {
         if (card.id === id) {
-          const isSelected = !selectedIds.includes(id);
+          const newStatus = selectedIds.includes(id) ? "pending" as FlashcardStatus : "accepted" as FlashcardStatus;
           return {
             ...card,
-            status: isSelected ? ("accepted" as const) : ("pending" as const),
+            status: newStatus,
           };
         }
         return card;
@@ -87,6 +115,19 @@ export function GenerationView() {
   };
 
   const handleSaveSuccess = () => {
+    // Update flashcards status after successful save
+    setFlashcards((cards) =>
+      cards.map((card) => {
+        if (selectedIds.includes(card.id)) {
+          return {
+            ...card,
+            status: "accepted" as FlashcardStatus,
+          };
+        }
+        return card;
+      })
+    );
+
     toast.success("Flashcards saved successfully!");
   };
 
@@ -139,12 +180,16 @@ export function GenerationView() {
               onDelete={handleDelete}
               onSelect={handleFlashcardSelect}
             />
-            <BulkSaveButton
-              generationId={generationId!}
-              flashcards={flashcards.filter((f) => selectedIds.includes(f.id))}
-              onSuccess={handleSaveSuccess}
-              onError={handleSaveError}
-            />
+            {flashcards.some(card => card.status === "accepted" || selectedIds.includes(card.id)) && (
+              <div className="mt-4">
+                <BulkSaveButton
+                  generationId={generationId!}
+                  flashcards={flashcards}
+                  onSuccess={handleSaveSuccess}
+                  onError={handleSaveError}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -81,7 +81,7 @@ Widok generowania fiszek umożliwia użytkownikowi wklejenie fragmentu tekstu, k
     id: string;
     front: string;
     back: string;
-    status: 'pending' | 'accepted' | 'rejected' | 'edited';
+    status: 'pending' | 'accepted' | 'rejected';
     source: 'ai-full' | 'ai-edited';
     isEditing?: boolean;
   };

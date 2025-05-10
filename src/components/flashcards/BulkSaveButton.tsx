@@ -14,6 +14,7 @@ interface BulkSaveButtonProps {
 
 export function BulkSaveButton({ generationId, flashcards, onSuccess, onError }: BulkSaveButtonProps) {
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
   const { isLoading, execute } = useApiCall<void>();
 
@@ -33,24 +34,42 @@ export function BulkSaveButton({ generationId, flashcards, onSuccess, onError }:
     try {
       await execute(
         async () => {
-          const response = await fetch("/api/flashcards/bulk", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              generation_id: generationId,
-              flashcards: acceptedFlashcards.map((f) => ({
-                id: f.id,
-                front: f.front,
-                back: f.back,
-              })),
-            }),
-          });
+          const total = acceptedFlashcards.length;
+          let completed = 0;
+          const failed: string[] = [];
 
-          if (!response.ok) {
-            const data = await response.json().catch(() => null);
-            throw new Error(data?.message || "Failed to save flashcards");
+          // Process each flashcard individually
+          for (const flashcard of acceptedFlashcards) {
+            try {
+              const response = await fetch(`/api/flashcards/${flashcard.id}`, {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  front: flashcard.front,
+                  back: flashcard.back,
+                  status: flashcard.status
+                }),
+              });
+
+              if (!response.ok) {
+                const data = await response.json().catch(() => null);
+                failed.push(flashcard.id);
+                console.error(`Failed to update flashcard ${flashcard.id}:`, data);
+              }
+            } catch (err) {
+              failed.push(flashcard.id);
+              console.error(`Error updating flashcard ${flashcard.id}:`, err);
+            }
+
+            completed++;
+            setProgress(Math.round((completed / total) * 100));
+          }
+
+          // If any flashcards failed to update, show an error
+          if (failed.length > 0) {
+            throw new Error(`Failed to update ${failed.length} flashcards`);
           }
         },
         {
@@ -76,7 +95,7 @@ export function BulkSaveButton({ generationId, flashcards, onSuccess, onError }:
 
       {isLoading && (
         <div className="space-y-2" data-testid="save-progress-container">
-          <Progress value={75} className="w-full" data-testid="save-progress" />
+          <Progress value={progress} className="w-full" data-testid="save-progress" />
           <p className="text-sm text-muted-foreground">Saving flashcards... This may take a moment.</p>
         </div>
       )}

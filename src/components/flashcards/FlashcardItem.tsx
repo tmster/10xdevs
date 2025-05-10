@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FlashcardViewModel } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -7,14 +7,23 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useApiCall } from "@/hooks/useApiCall";
-import { CheckIcon, XIcon, PencilIcon } from "lucide-react";
+import { CheckIcon, XIcon, PencilIcon, TrashIcon } from "lucide-react";
 
 interface FlashcardItemProps {
   flashcard: FlashcardViewModel;
-  onUpdate: (updates: Partial<FlashcardViewModel>) => void;
+  onUpdate: (id: string, updates: Partial<FlashcardViewModel>) => void;
+  onDelete: (id: string) => void;
+  selected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
-export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
+export function FlashcardItem({
+  flashcard,
+  onUpdate,
+  onDelete,
+  selected = false,
+  onSelect
+}: FlashcardItemProps) {
   const {
     isLoading: isActionLoading,
     error: actionError,
@@ -26,12 +35,24 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
   const [front, setFront] = useState(flashcard.front);
   const [back, setBack] = useState(flashcard.back);
 
-  const handleAction = async (updates: Partial<FlashcardViewModel>) => {
+  // Update local state when flashcard prop changes
+  useEffect(() => {
+    setFront(flashcard.front);
+    setBack(flashcard.back);
+    setIsEditing(flashcard.isEditing === true);
+  }, [flashcard]);
+
+  const handleAction = async (action: string, updates?: Partial<FlashcardViewModel>) => {
     await executeAction(
       async () => {
-        // Simulate API call delay - in real app, this would be a real API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        onUpdate(updates);
+        // In a real app, this would be a real API call
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        if (action === 'delete') {
+          onDelete(flashcard.id);
+        } else {
+          onUpdate(flashcard.id, updates || {});
+        }
       },
       {
         retryCount: 2,
@@ -41,19 +62,28 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
   };
 
   const handleAccept = () => {
-    onUpdate({ status: "accepted" });
+    handleAction('update', { status: "accepted" });
   };
 
   const handleReject = () => {
-    onUpdate({ status: "rejected" });
+    handleAction('update', { status: "rejected" });
   };
 
   const handleEdit = () => {
     setIsEditing(true);
+    onUpdate(flashcard.id, { isEditing: true });
   };
 
   const handleSave = () => {
-    onUpdate({ front, back });
+    if (front.trim() === '' || back.trim() === '') {
+      return; // Don't save if fields are empty
+    }
+
+    handleAction('update', {
+      front,
+      back,
+      isEditing: false,
+    });
     setIsEditing(false);
   };
 
@@ -61,6 +91,26 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
     setFront(flashcard.front);
     setBack(flashcard.back);
     setIsEditing(false);
+    onUpdate(flashcard.id, { isEditing: false });
+  };
+
+  const handleDelete = () => {
+    handleAction('delete');
+  };
+
+  const handleSelect = () => {
+    if (onSelect) {
+      onSelect(flashcard.id);
+    }
+  };
+
+  const getStatusIndicator = () => {
+    if (flashcard.status === "accepted") {
+      return <div className="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">Accepted</div>;
+    } else if (flashcard.status === "rejected") {
+      return <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">Rejected</div>;
+    }
+    return null;
   };
 
   if (isActionLoading) {
@@ -93,7 +143,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
             </Alert>
           )}
           <div className="space-y-2">
-            <Label htmlFor={`front-${flashcard.id}`} className="sr-only">
+            <Label htmlFor={`front-${flashcard.id}`}>
               Front side of the flashcard
             </Label>
             <Textarea
@@ -106,7 +156,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor={`back-${flashcard.id}`} className="sr-only">
+            <Label htmlFor={`back-${flashcard.id}`}>
               Back side of the flashcard
             </Label>
             <Textarea
@@ -125,6 +175,7 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
             aria-label="Save changes"
             className="bg-green-600 hover:bg-green-700"
             data-testid="flashcard-save-button"
+            disabled={front.trim() === '' || back.trim() === ''}
           >
             Save
           </Button>
@@ -145,9 +196,12 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
     <Card
       role="article"
       aria-label="Flashcard"
-      className={`relative ${flashcard.status === "rejected" ? "opacity-50" : ""}`}
+      className={`relative ${flashcard.status === "rejected" ? "opacity-50" : ""} ${selected ? "ring-2 ring-primary" : ""}`}
       data-testid={`flashcard-item-${flashcard.id}`}
+      onClick={onSelect ? handleSelect : undefined}
     >
+      {getStatusIndicator()}
+
       <CardContent className="p-4 space-y-4">
         {actionError && (
           <Alert variant="destructive" data-testid="flashcard-error">
@@ -169,60 +223,47 @@ export function FlashcardItem({ flashcard, onUpdate }: FlashcardItemProps) {
       </CardContent>
 
       <CardFooter className="p-4 pt-0 flex justify-end gap-2">
-        {isEditing ? (
-          <>
-            <Button
-              onClick={handleSave}
-              aria-label="Save changes"
-              className="bg-green-600 hover:bg-green-700"
-              data-testid="flashcard-save-button"
-            >
-              Save
-            </Button>
-            <Button
-              onClick={handleCancel}
-              variant="outline"
-              aria-label="Cancel editing"
-              data-testid="flashcard-cancel-button"
-            >
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              onClick={handleAccept}
-              disabled={flashcard.status === "rejected"}
-              aria-label="Accept flashcard"
-              className="bg-green-600 hover:bg-green-700"
-              data-testid="flashcard-accept-button"
-            >
-              <CheckIcon className="h-4 w-4" />
-              <span className="sr-only">Accept</span>
-            </Button>
-            <Button
-              onClick={handleEdit}
-              variant="outline"
-              disabled={flashcard.status === "rejected"}
-              aria-label="Edit flashcard"
-              data-testid="flashcard-edit-button"
-            >
-              <PencilIcon className="h-4 w-4" />
-              <span className="sr-only">Edit</span>
-            </Button>
-            <Button
-              onClick={handleReject}
-              variant="outline"
-              disabled={flashcard.status === "rejected"}
-              aria-label="Reject flashcard"
-              className="text-red-600 hover:text-red-700"
-              data-testid="flashcard-reject-button"
-            >
-              <XIcon className="h-4 w-4" />
-              <span className="sr-only">Reject</span>
-            </Button>
-          </>
-        )}
+        <Button
+          onClick={handleAccept}
+          disabled={flashcard.status === "rejected"}
+          aria-label="Accept flashcard"
+          className={`${flashcard.status === "accepted" ? "bg-green-700" : "bg-green-600 hover:bg-green-700"}`}
+          data-testid="flashcard-accept-button"
+        >
+          <CheckIcon className="h-4 w-4" />
+          <span className="sr-only">Accept</span>
+        </Button>
+        <Button
+          onClick={handleEdit}
+          variant="outline"
+          disabled={flashcard.status === "rejected"}
+          aria-label="Edit flashcard"
+          data-testid="flashcard-edit-button"
+        >
+          <PencilIcon className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
+        </Button>
+        <Button
+          onClick={handleReject}
+          variant="outline"
+          disabled={flashcard.status === "rejected"}
+          aria-label="Reject flashcard"
+          className="text-red-600 hover:text-red-700"
+          data-testid="flashcard-reject-button"
+        >
+          <XIcon className="h-4 w-4" />
+          <span className="sr-only">Reject</span>
+        </Button>
+        <Button
+          onClick={handleDelete}
+          variant="outline"
+          aria-label="Delete flashcard"
+          className="text-red-600 hover:text-red-700"
+          data-testid="flashcard-delete-button"
+        >
+          <TrashIcon className="h-4 w-4" />
+          <span className="sr-only">Delete</span>
+        </Button>
       </CardFooter>
     </Card>
   );
