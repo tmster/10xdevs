@@ -18,7 +18,7 @@ export type FlashcardDTO = Omit<FlashcardDB, "generation_id" | "user_id">;
 export type CreateFlashcardCommand = Pick<FlashcardDTO, "front" | "back">;
 
 // Command model for updating an existing flashcard (PATCH /api/flashcards/:id)
-export type UpdateFlashcardCommand = Pick<FlashcardDTO, "front" | "back" | "status">;
+export type UpdateFlashcardCommand = Partial<Pick<FlashcardDTO, "front" | "back" | "status">>;
 
 // Command model for generating flashcards via AI (POST /api/flashcards/generate)
 export interface GenerateFlashcardsCommand {
