@@ -5,6 +5,11 @@ on:
     branches: [ main, master, develop ]
     types: [ opened, synchronize, reopened ]
 
+# Add permissions for the GITHUB_TOKEN to allow commenting on PRs
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   lint:
     name: Lint Code
@@ -76,31 +81,18 @@ jobs:
         # Only install Chromium browser as per the playwright config
         run: npx playwright install chromium
 
-      - name: Set up environment
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          PUBLIC_SITE_URL: ${{ secrets.PUBLIC_SITE_URL }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
-          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-          BASE_URL: ${{ secrets.PUBLIC_SITE_URL || 'http://localhost:3001' }}
-        run: |
-          echo "Setting up environment variables for E2E tests"
-          cp .env.example .env.test
-          sed -i "s|your-supabase-url|$SUPABASE_URL|g" .env.test
-          sed -i "s|your-supabase-anon-key|$SUPABASE_KEY|g" .env.test
-          sed -i "s|your-openrouter-api-key|$OPENROUTER_API_KEY|g" .env.test
-          sed -i "s|test@example.com|$E2E_USERNAME|g" .env.test
-          sed -i "s|password123|$E2E_PASSWORD|g" .env.test
-          sed -i "s|http://localhost:4321|$BASE_URL|g" .env.test
-          echo "BASE_URL=$BASE_URL" >> .env.test
-          echo "CI=true" >> .env.test
-
       - name: Run E2E Tests
         run: npm run e2e
         env:
           CI: true
+          BASE_URL: ${{ secrets.PUBLIC_SITE_URL || 'http://localhost:3000' }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          PUBLIC_SITE_URL: ${{ secrets.PUBLIC_SITE_URL }}
+          TEST_VARIABLE: working
           # Set timeouts higher for CI environment
           PLAYWRIGHT_TIMEOUT: 60000
 
@@ -130,6 +122,22 @@ jobs:
           name: e2e-test-results
           path: e2e-results
 
+      - name: Debug Artifact Structure
+        run: |
+          echo "Listing downloaded artifacts:"
+          find e2e-results -type f | sort
+
+          # Check content of results files if they exist
+          if [ -f "e2e-results/playwright-report/results.json" ]; then
+            echo "Contents of e2e-results/playwright-report/results.json:"
+            cat "e2e-results/playwright-report/results.json" | head -20
+          fi
+
+          if [ -f "e2e-results/test-results/e2e-results.json" ]; then
+            echo "Contents of e2e-results/test-results/e2e-results.json:"
+            cat "e2e-results/test-results/e2e-results.json" | head -20
+          fi
+
       - name: Create Status Comment
         uses: actions/github-script@v7
         with:
@@ -155,18 +163,135 @@ jobs:
 
             // Attempt to read E2E test results
             let e2eTestInfo = 'E2E test results not available';
-            try {
-              if (fs.existsSync('e2e-results/test-results/e2e-results.json')) {
-                const e2eResults = JSON.parse(fs.readFileSync('e2e-results/test-results/e2e-results.json', 'utf8'));
-                const passedTests = e2eResults.suites.reduce((acc, suite) => acc + suite.specs.filter(spec => spec.ok).length, 0);
-                const totalTests = e2eResults.suites.reduce((acc, suite) => acc + suite.specs.length, 0);
 
-                e2eTestInfo = `E2E Test Results:
-                - Passed: ${passedTests}/${totalTests} tests (${Math.round(passedTests/totalTests*100)}%)
-                - Duration: ${(e2eResults.duration/1000).toFixed(2)}s`;
+            // Helper function to safely access nested properties
+            const safeGet = (obj, path, fallback) => {
+              try {
+                return path.split('.').reduce((o, key) => (o && o[key] !== undefined) ? o[key] : fallback, obj);
+              } catch (e) {
+                return fallback;
+              }
+            };
+
+            // Find and parse E2E test results
+            try {
+              console.log('Looking for E2E test results...');
+
+              const possibleResultPaths = [
+                'e2e-results/test-results/e2e-results.json',
+                'test-results/e2e-results.json',
+                'e2e-results/playwright-report/results.json',
+                'playwright-report/results.json'
+              ];
+
+              let resultData = null;
+              let usedPath = '';
+
+              // Try to find and read a result file
+              for (const path of possibleResultPaths) {
+                console.log(`Checking ${path}`);
+                if (fs.existsSync(path)) {
+                  console.log(`Found ${path}`);
+                  usedPath = path;
+                  try {
+                    resultData = JSON.parse(fs.readFileSync(path, 'utf8'));
+                    console.log(`Successfully parsed ${path}`);
+                    break;
+                  } catch (err) {
+                    console.log(`Error parsing ${path}: ${err.message}`);
+                  }
+                }
+              }
+
+              if (resultData) {
+                console.log(`Using test results from: ${usedPath}`);
+
+                // Extract test statistics - first try using the stats section if it exists
+                if (resultData.stats) {
+                  console.log('Found stats section in results file');
+                  const stats = resultData.stats;
+
+                  // Use the stats section for accurate counts
+                  const totalTests = safeGet(stats, 'expected', 0) +
+                                    safeGet(stats, 'unexpected', 0) +
+                                    safeGet(stats, 'skipped', 0) +
+                                    safeGet(stats, 'flaky', 0);
+
+                  const passedTests = safeGet(stats, 'expected', 0);
+                  const failedTests = safeGet(stats, 'unexpected', 0);
+                  const skippedTests = safeGet(stats, 'skipped', 0);
+                  const flakyTests = safeGet(stats, 'flaky', 0);
+
+                  // Calculate pass rate
+                  const passRate = totalTests > 0 ?
+                    Math.round((passedTests / totalTests) * 100) : 0;
+
+                  // Format duration from milliseconds to seconds
+                  const durationMs = safeGet(stats, 'duration', 0);
+                  const duration = (durationMs / 1000).toFixed(2);
+
+                  // Build the test info string
+                  e2eTestInfo = `E2E Test Results:
+                - Passed: ${passedTests}/${totalTests} tests (${passRate}%)
+                - Failed: ${failedTests}
+                - Skipped: ${skippedTests}
+                - Flaky: ${flakyTests}
+                - Duration: ${duration}s`;
+                }
+                // If no stats section, try to manually count from the nested structure
+                else if (Array.isArray(resultData.suites)) {
+                  console.log('No stats section, scanning nested suite structure');
+
+                  // Function to recursively count specs in nested suites
+                  const countSpecs = (suites) => {
+                    let passed = 0;
+                    let total = 0;
+
+                    const processSpec = (spec) => {
+                      total++;
+                      if (spec.ok === true) {
+                        passed++;
+                      }
+                    };
+
+                    const processSuite = (suite) => {
+                      // Count specs in this suite
+                      if (Array.isArray(suite.specs)) {
+                        suite.specs.forEach(processSpec);
+                      }
+
+                      // Process nested suites
+                      if (Array.isArray(suite.suites)) {
+                        suite.suites.forEach(processSuite);
+                      }
+                    };
+
+                    suites.forEach(processSuite);
+                    return { passed, total };
+                  };
+
+                  const counts = countSpecs(resultData.suites);
+                  const passRate = counts.total > 0 ?
+                    Math.round((counts.passed / counts.total) * 100) : 0;
+
+                  // Try to get duration
+                  const duration = typeof resultData.duration === 'number' ?
+                    (resultData.duration / 1000).toFixed(2) : 'unknown';
+
+                  e2eTestInfo = `E2E Test Results:
+                - Passed: ${counts.passed}/${counts.total} tests (${passRate}%)
+                - Failed: ${counts.total - counts.passed}
+                - Duration: ${duration}s`;
+                }
+                else {
+                  e2eTestInfo = 'E2E test results found but in unexpected format';
+                }
+              } else {
+                e2eTestInfo = 'E2E test results not found in any expected location';
               }
             } catch (error) {
-              e2eTestInfo = `Error reading E2E test results: ${error.message}`;
+              console.log(`Error processing E2E results: ${error.message}`);
+              e2eTestInfo = `Error processing E2E test results: ${error.message}`;
             }
 
             const body = `## CI Status: ✅ All checks passed!

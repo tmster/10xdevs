@@ -48,12 +48,12 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "npm run dev:e2e",
-    url: "http://localhost:3001",
+    command: "npm run dev:e2e -- --verbose",
+    url: process.env.BASE_URL || "http://localhost:3001",
     reuseExistingServer: !process.env.CI,
     stdout: "pipe",
     stderr: "pipe",
-    timeout: 120000,
+    timeout: 60000,
   },
 
   /* Global setup and teardown */
