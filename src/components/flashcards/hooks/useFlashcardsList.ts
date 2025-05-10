@@ -24,6 +24,7 @@ interface UseFlashcardsListReturn {
 const DEFAULT_FILTERS: FlashcardsListFilters = {
   sort: "created_at",
   order: "desc",
+  status: "accepted"
 };
 
 const PER_PAGE = 10;

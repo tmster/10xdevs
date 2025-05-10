@@ -62,9 +62,9 @@ export function Header({ onCreateClick, onFilterChange, filters }: HeaderProps) 
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="accepted">Accepted</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
