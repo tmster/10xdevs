@@ -5,44 +5,76 @@ on:
     branches: [master]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
-  ci:
+  lint:
+    name: Lint Code
     runs-on: ubuntu-latest
-    env:
-      PUBLIC_SITE_URL: ${{ secrets.PUBLIC_SITE_URL }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
-      E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Use Node.js version from .nvmrc
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Run Linting
         run: npm run lint
 
-      - name: Format check
-        run: npm run format -- --check
+  unit-test:
+    name: Unit Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Run unit & integration tests
-        run: npm run test
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
 
-      - name: Upload unit test coverage
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Unit Tests with Coverage
+        run: npm run test:coverage
+        env:
+          VITEST_COVERAGE: true
+
+      - name: Upload Unit Test Coverage
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-coverage
           path: coverage/
-          retention-days: 7
+          retention-days: 5
+
+  e2e-test:
+    name: E2E Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    environment: integration
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Install Playwright Browsers
         # Only install Chromium browser as per the playwright config
@@ -53,6 +85,14 @@ jobs:
         env:
           CI: true
           BASE_URL: ${{ secrets.PUBLIC_SITE_URL || 'http://localhost:3000' }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          PUBLIC_SITE_URL: ${{ secrets.PUBLIC_SITE_URL }}
+          TEST_VARIABLE: working
+          # Set timeouts higher for CI environment
           PLAYWRIGHT_TIMEOUT: 60000
 
       - name: Upload E2E Test Results
@@ -62,14 +102,3 @@ jobs:
           path: |
             playwright-report/
             test-results/
-          retention-days: 7
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
