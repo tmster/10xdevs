@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { DashboardViewModel, StatisticsDTO, FlashcardViewModel } from "@/types";
+import type { DashboardViewModel, StatisticsDTO } from "@/types";
 
 // Mock data for development
 const mockStats: StatisticsDTO = {
