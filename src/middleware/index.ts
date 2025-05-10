@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
-import { createSupabaseServerClient } from "../db/supabase.client";
+import { createSupabaseServerClient, type SupabaseClient } from "../db/supabase.client";
+import type { User } from "@supabase/supabase-js";
 
 // Public paths that don't require authentication
 const PUBLIC_PATHS = [
@@ -13,6 +14,17 @@ const PUBLIC_PATHS = [
   "/api/auth/forgot-password",
   "/api/auth/reset-password",
 ];
+
+// Define the minimal user type we need
+type MinimalUser = Pick<User, "id" | "email">;
+
+// Extend Astro's Locals interface
+declare module "astro" {
+  interface Locals {
+    supabase: SupabaseClient;
+    user?: MinimalUser;
+  }
+}
 
 export const onRequest = defineMiddleware(async ({ locals, cookies, url, request, redirect }, next) => {
   // Create the Supabase client
@@ -32,10 +44,13 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
 
   // Special case for root path
   if (path === "/") {
-    // Get session
-    const { data } = await supabase.auth.getSession();
+    // Get authenticated user
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-    if (data.session) {
+    if (user && !error) {
       // User is logged in, redirect to flashcards
       return redirect("/flashcards/list");
     } else {
@@ -46,13 +61,16 @@ export const onRequest = defineMiddleware(async ({ locals, cookies, url, request
 
   // For non-public paths, check authentication
   if (!isPublicPath) {
-    const { data } = await supabase.auth.getSession();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-    if (data.session) {
+    if (user && !error) {
       // User is authenticated, set user data and continue
       locals.user = {
-        id: data.session.user.id,
-        email: data.session.user.email,
+        id: user.id,
+        email: user.email,
       };
     } else {
       // User is not authenticated, redirect to login
