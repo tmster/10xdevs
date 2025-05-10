@@ -1,11 +1,22 @@
-import { useState } from "react";
-import type { FlashcardDTO, FlashcardStatus } from "@/types";
+import { useState, useEffect } from "react";
+import type { FlashcardStatus } from "@/types";
 import { useFlashcardsList } from "./hooks/useFlashcardsList";
 import { Header } from "./Header";
 import { FlashcardsList } from "./FlashcardsList";
 import { CreateFlashcardDialog } from "./CreateFlashcardDialog";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { ErrorBoundary } from "./ErrorBoundary";
+
+interface Filters {
+  status?: string;
+  source?: string;
+  sort: string;
+  order: string;
+}
+
+interface FlashcardsIndexViewProps {
+  initialFilters?: Filters;
+}
 
 export interface FlashcardsListFilters {
   status?: FlashcardStatus;
@@ -14,23 +25,11 @@ export interface FlashcardsListFilters {
   order: "asc" | "desc";
 }
 
-export interface FlashcardsListState {
-  items: FlashcardDTO[];
-  pagination: {
-    page: number;
-    perPage: number;
-    total: number;
-  };
-  filters: FlashcardsListFilters;
-  selectedIds: string[];
-}
-
-export function FlashcardsIndexView() {
+export function FlashcardsIndexView({ initialFilters }: FlashcardsIndexViewProps) {
   // State for dialogs
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [deleteFlashcardId, setDeleteFlashcardId] = useState<string | null>(null);
 
-  // Custom hook for managing flashcards list
   const {
     flashcards,
     pagination,
@@ -46,6 +45,18 @@ export function FlashcardsIndexView() {
     handleSelect,
   } = useFlashcardsList();
 
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    if (initialFilters) {
+      setFilters({
+        status: initialFilters.status as FlashcardStatus | undefined,
+        source: initialFilters.source as "ai-full" | "ai-edited" | "manual" | undefined,
+        sort: (initialFilters.sort || "created_at") as "created_at" | "updated_at",
+        order: (initialFilters.order || "desc") as "asc" | "desc",
+      });
+    }
+  }, [initialFilters, setFilters]);
+
   return (
     <ErrorBoundary>
       <div className="container mx-auto py-6 space-y-6">
@@ -56,12 +67,12 @@ export function FlashcardsIndexView() {
         <FlashcardsList
           flashcards={flashcards}
           pagination={pagination}
+          selectedIds={selectedIds}
+          isLoading={isLoading}
           onPageChange={setPage}
           onEdit={handleEdit}
           onDelete={(id) => setDeleteFlashcardId(id)}
           onSelect={handleSelect}
-          selectedIds={selectedIds}
-          isLoading={isLoading}
         />
 
         <CreateFlashcardDialog

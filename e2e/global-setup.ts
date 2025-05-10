@@ -13,8 +13,6 @@ const supabaseKey = process.env.SUPABASE_KEY || "";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function globalSetup(_config: FullConfig) {
   // Create the Supabase client for test setup
-  console.log("supabaseUrl", supabaseUrl);
-  console.log("supabaseKey", supabaseKey);
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   // Log in with test user credentials

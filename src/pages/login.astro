@@ -27,8 +27,8 @@ if (Astro.request.method === "POST") {
       if (authError) {
         error = authError.message;
       } else {
-        // Successfully logged in, redirect
-        return Astro.redirect("/flashcards/list");
+        // Successfully logged in, redirect to dashboard
+        return Astro.redirect("/dashboard");
       }
     }
   } catch (e) {
